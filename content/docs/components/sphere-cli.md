@@ -126,7 +126,7 @@ sphere-cli service golang --name UserService --package api.v1 --mod github.com/m
 
 ### `retags` (Deprecated)
 
-> **Note**: This command is deprecated. Use [`protoc-gen-sphere-binding`](../generators/protoc-gen-sphere-binding) instead.
+> **Note**: This command is deprecated. Use [`protoc-gen-sphere-binding`](protoc-gen-sphere-binding) instead.
 
 The `retags` command was used to inject struct tags into generated protobuf Go files, but this functionality has been moved to the more robust `protoc-gen-sphere-binding` plugin.
 
@@ -242,7 +242,7 @@ make gen/all  # Regenerate everything
 
 ## See Also
 
-- [Creating Your First Project](../../getting-started/creating-your-first-project) - Complete project setup guide
+- [Quick Start](../../getting-started/quickstart) - Complete project setup guide
 - [Project Structure](../../concepts/project-structure) - Understanding the generated project layout
-- [Code Generators](../generators) - Details about protoc plugins used by sphere-cli
+- [Components Overview](../) - Details about protoc plugins used by sphere-cli
 

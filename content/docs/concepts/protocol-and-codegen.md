@@ -221,10 +221,8 @@ proto/
 
 - [API Definitions Guide](../guides/api-definitions) - Detailed HTTP mapping rules and examples
 - [Error Handling Guide](../guides/error-handling) - Comprehensive error patterns and implementation
-- [Code Generators](../components/generators) - Individual generator documentation and configuration
+- [Components Overview](../components/) - Individual generator documentation and configuration
 - [Project Structure](project-structure) - How generated code fits into the overall project layout
-}
-```
 
 ### Error Definitions
 
@@ -456,6 +454,6 @@ plugins:
 
 - [API Definitions Guide](../guides/api-definitions) - Detailed HTTP mapping rules
 - [Error Handling Guide](../guides/error-handling) - Comprehensive error patterns
-- [Code Generators](../components/generators) - Individual generator documentation
+- [Components Overview](../components/) - Individual generator documentation
 - [Project Structure](project-structure) - How generated code fits into projects
 
