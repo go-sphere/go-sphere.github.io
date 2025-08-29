@@ -26,20 +26,22 @@ This approach provides:
 - **Client SDKs**: Automatically generated for multiple languages
 - **Reduced Boilerplate**: No manual HTTP handler writing
 
-## Protobuf as the Contract
+## Protocol as Contract
+
+### Single Source of Truth
+
+Your `.proto` files serve as the authoritative definition of:
+- **Data structures** (messages)
+- **API operations** (services and methods)
+- **Error conditions** (enums with metadata)
+- **HTTP mapping** (via annotations)
+- **Field constraints** (via validation rules)
 
 ### Service Definitions
 
 Services define the operations your API supports:
 
 ```protobuf
-syntax = "proto3";
-
-package api.v1;
-
-import "google/api/annotations.proto";
-import "sphere/binding/binding.proto";
-
 service UserService {
   rpc GetUser(GetUserRequest) returns (User) {
     option (google.api.http) = {
@@ -51,19 +53,6 @@ service UserService {
     option (google.api.http) = {
       post: "/v1/users"
       body: "*"
-    };
-  }
-  
-  rpc UpdateUser(UpdateUserRequest) returns (User) {
-    option (google.api.http) = {
-      put: "/v1/users/{id}"
-      body: "user"
-    };
-  }
-  
-  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      delete: "/v1/users/{id}"
     };
   }
 }
@@ -85,19 +74,155 @@ message User {
 message GetUserRequest {
   int64 id = 1 [(sphere.binding.location) = BINDING_LOCATION_URI];
 }
+```
 
-message CreateUserRequest {
-  string name = 1 [(buf.validate.field).string.min_len = 1];
-  string email = 2 [(buf.validate.field).string.pattern = "^[^@]+@[^@]+$"];
+### Error Definitions
+
+Errors are defined as enums with rich metadata:
+
+```protobuf
+import "sphere/errors/errors.proto";
+
+enum UserError {
+  option (sphere.errors.default_status) = 500;
+  
+  USER_ERROR_UNSPECIFIED = 0;
+  USER_ERROR_NOT_FOUND = 1001 [(sphere.errors.options) = {
+    status: 404
+    reason: "USER_NOT_FOUND"
+    message: "User not found"
+  }];
 }
+```
 
-message UpdateUserRequest {
-  int64 id = 1 [(sphere.binding.location) = BINDING_LOCATION_URI];
-  User user = 2;
-}
+## Code Generation Pipeline
 
-message DeleteUserRequest {
-  int64 id = 1 [(sphere.binding.location) = BINDING_LOCATION_URI];
+### Generator Chain
+
+The code generation happens in a specific order:
+
+1. **protoc-gen-go**: Generate base Go types
+2. **protoc-gen-sphere-binding**: Add struct tags for binding
+3. **protoc-gen-sphere**: Generate HTTP handlers and routing
+4. **protoc-gen-sphere-errors**: Generate error types and handling
+5. **protoc-gen-route**: Generate custom routing (optional)
+
+### What Gets Generated
+
+From your proto definitions, you automatically get:
+
+#### Server-side Code
+- **Service interfaces** to implement
+- **HTTP handlers** with proper routing
+- **Request binding** with validation
+- **Response marshaling** with proper headers
+- **Error handling** with consistent formatting
+
+#### Client-side Code
+- **OpenAPI/Swagger documentation**
+- **TypeScript SDKs** (optional)
+- **Go client stubs** (if needed)
+- **Validation schemas** for frontend use
+
+#### Developer Tools
+- **Interactive documentation** via Swagger UI
+- **API testing** endpoints
+- **Type definitions** for IDE support
+
+## Benefits of This Approach
+
+### Type Safety
+- Compile-time verification of API contracts
+- No runtime surprises from mismatched types
+- Automatic validation of required fields
+- IDE support with autocomplete and error checking
+
+### Consistency
+- Single source of truth for API definitions
+- Consistent naming across all generated code
+- Uniform error handling patterns
+- Standardized HTTP response formats
+
+### Developer Experience
+- Faster iteration cycles
+- Less boilerplate code to maintain
+- Clear separation of concerns
+- Automatic documentation updates
+
+### Scalability
+- Easy to add new services and methods
+- Version management built-in
+- Multiple output targets from one definition
+- Team coordination through shared contracts
+
+## Protocol Organization
+
+### Recommended Structure
+```
+proto/
+├── shared/v1/           # Common messages
+│   ├── user.proto
+│   └── common.proto
+├── api/v1/              # Service definitions
+│   ├── user_service.proto
+│   └── auth_service.proto
+└── errors/v1/           # Error definitions
+    ├── user_errors.proto
+    └── common_errors.proto
+```
+
+### Versioning Strategy
+- Use explicit version packages (`v1`, `v2`)
+- Keep shared types separate from services
+- Plan for backwards compatibility
+- Document breaking changes clearly
+
+## Evolution and Maintenance
+
+### Adding New Features
+1. Define new messages/services in `.proto`
+2. Run code generation
+3. Implement service methods
+4. Tests and documentation are automatically updated
+
+### API Versioning
+- Create new version packages for breaking changes
+- Maintain multiple versions simultaneously
+- Gradual migration paths for clients
+- Automatic deprecation warnings
+
+### Team Collaboration
+- Proto files as API contracts between teams
+- Code review focuses on API design
+- Generated code handles implementation details
+- Consistent patterns across all services
+
+## Best Practices
+
+### Proto Design
+1. **Clear naming**: Use descriptive, consistent names
+2. **Proper grouping**: Organize by domain and version
+3. **Forward compatibility**: Design for future evolution
+4. **Documentation**: Comment services, methods, and fields
+
+### Code Generation
+1. **Frequent regeneration**: Update generated code early and often
+2. **Don't edit generated files**: All changes go in `.proto` files
+3. **Version control**: Commit both `.proto` and generated files
+4. **Automation**: Integrate generation into build process
+
+### Error Handling
+1. **Comprehensive coverage**: Define errors for all failure modes
+2. **Appropriate status codes**: Use correct HTTP status codes
+3. **Clear messages**: Write user-friendly error messages
+4. **Structured data**: Include relevant context in errors
+
+## See Also
+
+- [API Definitions Guide](../guides/api-definitions) - Detailed HTTP mapping rules and examples
+- [Error Handling Guide](../guides/error-handling) - Comprehensive error patterns and implementation
+- [Code Generators](../components/generators) - Individual generator documentation and configuration
+- [Project Structure](project-structure) - How generated code fits into the overall project layout
 }
 ```
 

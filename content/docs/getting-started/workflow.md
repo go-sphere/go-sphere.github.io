@@ -1,43 +1,78 @@
 ---
 title: Development Workflow
-weight: 40
+weight: 20
 aliases:
   - /docs/start/workflow/
   - /docs/start/workflow
 ---
 
-An end-to-end flow you can iterate on from day one. This page links to detailed steps to avoid duplication.
+A typical day-to-day development cycle with Sphere follows this pattern:
 
-1) Bootstrap
-- Install the tooling and create a project
-- See: Docs → Getting Started → Installation, Creating Your First Project
+## Core Development Loop
 
-2) Model and Storage
-- Define Ent schemas under `internal/pkg/database/ent/schema/**`
-- See also: Concepts → Project Layout
+1. **Model Your Data**
+   - Define Ent schemas in `internal/pkg/database/ent/schema/`
+   - Run `make gen/db` to generate database code
 
-3) API Contract
-- Create `.proto` for messages and RPCs under `proto/**`
-- Guidance: Guides → API Definitions
+2. **Define Your API**
+   - Create `.proto` files in `proto/`
+   - Use `google.api.http` annotations for HTTP endpoints
+   - Run `make gen/proto` to generate Go handlers
 
-4) Server + Docs
-- Implement service methods in `internal/service/**`; keep orchestration simple
-- See: Docs → Getting Started → Quickstart (Wire and Run)
+3. **Implement Business Logic**
+   - Write service implementations in `internal/service/`
+   - Keep logic focused and testable
 
-5) Errors
-- Define error enums in `.proto` with `sphere/errors` options
-- Guidance: Guides → Error Handling
+4. **Wire and Test**
+   - Run `make gen/wire` for dependency injection
+   - Start with `make run`
+   - Test endpoints via Swagger UI (`make run/swag`)
 
-6) Wire and Run
-- Generate DI, run the server, and browse Swagger
-- See: Docs → Getting Started → Quickstart (Wire and Run)
+## Adding New Features
 
-7) Client SDKs (optional)
-- Generate TypeScript clients from Swagger
-- See: Docs → Getting Started → Quickstart (Generate TypeScript Client)
+**For a new entity:**
+```bash
+# 1. Add Ent schema
+# 2. Regenerate database code
+make gen/db
 
-Iterate Fast
-- Add entities → regenerate db
-- Add/adjust RPCs → regenerate proto/server/docs
-- Keep service logic clean and focused
+# 3. Add proto messages and services
+# 4. Regenerate API code
+make gen/proto
+make gen/docs
+
+# 5. Implement service methods
+# 6. Wire and run
+make gen/wire
+make run
+```
+
+**For API changes:**
+```bash
+# 1. Update .proto files
+# 2. Regenerate
+make gen/proto
+make gen/docs
+
+# 3. Update service implementations
+# 4. Test
+make run
+```
+
+## Generated Artifacts
+
+- `make gen/db` → Ent client and schemas
+- `make gen/proto` → Go handlers, types, and routing
+- `make gen/docs` → OpenAPI/Swagger documentation  
+- `make gen/wire` → Dependency injection wiring
+- `make gen/dts` → TypeScript client SDKs
+
+## Best Practices
+
+- **Keep services thin**: Move complex business logic to `internal/biz/`
+- **Test early**: Use generated Swagger UI to verify endpoints
+- **Iterate fast**: Small changes → quick regeneration cycles
+- **Version APIs**: Use proto package versioning for breaking changes
+
+See [Quick Start](quickstart) for the complete setup process.
 
