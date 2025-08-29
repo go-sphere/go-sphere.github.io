@@ -3,30 +3,246 @@ title: Sphere CLI
 weight: 10
 ---
 
-Sphere CLI streamlines common project tasks: create projects, generate services, convert Ent schemas to proto, retag, and rename modules.
+Sphere CLI (`sphere-cli`) is a command-line tool designed to streamline the development of [Sphere](https://github.com/go-sphere/sphere) projects. It helps you create new projects, generate service code, manage Protobuf definitions, and perform other common development tasks.
 
-Install
-- `go install github.com/go-sphere/sphere-cli@latest`
+## Installation
 
-Usage
-- `sphere-cli [command] [flags]`
-- `sphere-cli [command] --help` for details
+To install `sphere-cli`, ensure you have Go installed and run the following command:
 
-Key Commands
-- `create`: bootstrap a new project
-  - `sphere-cli create --name <project-name> [--module <go-module-name>]`
-- `entproto`: convert Ent schemas into `.proto`
-  - `--path`: ent schema dir; `--proto`: output dir
-  - flags: `--all_fields_required`, `--auto_annotation`, `--enum_raw_type`, `--skip_unsupported`, `--time_proto_type`, `--uuid_proto_type`, `--unsupported_proto_type`, `--import_proto`
-- `service proto`: scaffold a service `.proto`
-  - `sphere-cli service proto --name <service-name> [--package <pkg>]`
-- `service golang`: scaffold Go service implementation
-  - `sphere-cli service golang --name <service> [--package <pkg>] [--mod <module>]`
-- `retags` (deprecated): inject struct tags into generated `.pb.go` (use `protoc-gen-sphere-binding` instead)
-- `rename`: rewrite Go module path across repo
+```shell
+go install github.com/go-sphere/sphere-cli@latest
+```
 
-When to Use
-- First setup with `create`
-- Evolve schema with `entproto`
-- Bootstrap new APIs with `service`
+## Usage
+
+The general syntax for `sphere-cli` is:
+
+```shell
+sphere-cli [command] [flags]
+```
+
+For detailed information on any command, you can use the `--help` flag:
+
+```shell
+sphere-cli [command] --help
+```
+
+## Commands
+
+Here is an overview of the available commands.
+
+### `create`
+
+Initializes a new Sphere project with a default template.
+
+**Usage:**
+```shell
+sphere-cli create --name <project-name> [--module <go-module-name>]
+```
+
+**Flags:**
+- `--name string`: (Required) The name for the new Sphere project.
+- `--module string`: (Optional) The Go module path for the project.
+
+**Example:**
+```shell
+sphere-cli create --name myproject --module github.com/myorg/myproject
+```
+
+This command creates a new project directory with the [sphere-layout](https://github.com/go-sphere/sphere-layout) template, including:
+- Makefile for build automation
+- buf configuration for protobuf management
+- Standard directory structure
+- Example configurations
+
+### `entproto`
+
+Converts Ent schemas into Protobuf (`.proto`) definitions. This command reads your Ent schema files and generates corresponding `.proto` files.
+
+**Usage:**
+```shell
+sphere-cli entproto [flags]
+```
+
+**Flags:**
+- `--path string`: Path to the Ent schema directory (default: `./schema`).
+- `--proto string`: Output directory for the generated `.proto` files (default: `./proto`).
+- `--all_fields_required`: Treat all fields as required, ignoring `Optional()` (default: `true`).
+- `--auto_annotation`: Automatically add `@entproto` annotations to the schema (default: `true`).
+- `--enum_raw_type`: Use `string` as the type for enums in Protobuf (default: `true`).
+- `--skip_unsupported`: Skip fields with types that are not supported (default: `true`).
+- `--time_proto_type string`: Protobuf type to use for `time.Time` fields. Options: `int64`, `string`, `google.protobuf.Timestamp` (default: `int64`).
+- `--uuid_proto_type string`: Protobuf type to use for `uuid.UUID` fields. Options: `string`, `bytes` (default: `string`).
+- `--unsupported_proto_type string`: Protobuf type to use for unsupported fields. Options: `google.protobuf.Any`, `google.protobuf.Struct`, `bytes` (default: `google.protobuf.Any`).
+- `--import_proto string`: Define external Protobuf imports. Format: `path1,package1,type1;path2,package2,type2` (default: `google/protobuf/any.proto,google.protobuf,Any;`).
+
+**Example:**
+```shell
+sphere-cli entproto --path ./internal/pkg/database/ent/schema --proto ./proto/entpb
+```
+
+### `service`
+
+Generates service code, including both Protobuf definitions and Go service implementations.
+
+This command has two subcommands: `proto` and `golang`.
+
+#### `service proto`
+
+Generates a `.proto` file for a new service.
+
+**Usage:**
+```shell
+sphere-cli service proto --name <service-name> [--package <package-name>]
+```
+
+**Flags:**
+- `--name string`: (Required) The name of the service.
+- `--package string`: The package name for the generated `.proto` file (default: `dash.v1`).
+
+**Example:**
+```shell
+sphere-cli service proto --name UserService --package api.v1
+```
+
+#### `service golang`
+
+Generates the Go implementation for a service from its definition.
+
+**Usage:**
+```shell
+sphere-cli service golang --name <service-name> [--package <package-name>] [--mod <go-module-path>]
+```
+
+**Flags:**
+- `--name string`: (Required) The name of the service.
+- `--package string`: The package name for the generated Go code (default: `dash.v1`).
+- `--mod string`: The Go module path for the generated code (default: `github.com/go-sphere/sphere-layout`).
+
+**Example:**
+```shell
+sphere-cli service golang --name UserService --package api.v1 --mod github.com/myorg/myproject
+```
+
+### `retags` (Deprecated)
+
+> **Note**: This command is deprecated. Use [`protoc-gen-sphere-binding`](../generators/protoc-gen-sphere-binding) instead.
+
+The `retags` command was used to inject struct tags into generated protobuf Go files, but this functionality has been moved to the more robust `protoc-gen-sphere-binding` plugin.
+
+### `rename`
+
+Renames the Go module path across the entire repository. This is useful when you need to change the module path after creating a project.
+
+**Usage:**
+```shell
+sphere-cli rename --old <old-module-path> --new <new-module-path>
+```
+
+## Workflow Examples
+
+### Creating a New Project
+
+```shell
+# 1. Create the project
+sphere-cli create --name myapp --module github.com/myorg/myapp
+
+# 2. Navigate to the project
+cd myapp
+
+# 3. Initialize dependencies
+make init
+
+# 4. Generate initial code
+make gen/all
+```
+
+### Adding a New Service
+
+```shell
+# 1. Generate the proto file
+sphere-cli service proto --name UserService --package api.v1
+
+# 2. Edit the generated proto file to add methods
+# vim proto/api/v1/user_service.proto
+
+# 3. Generate the Go implementation
+sphere-cli service golang --name UserService --package api.v1 --mod github.com/myorg/myapp
+
+# 4. Generate all code
+make gen/all
+```
+
+### Working with Ent Schemas
+
+```shell
+# 1. Define your Ent schemas in internal/pkg/database/ent/schema/
+
+# 2. Convert Ent schemas to proto
+sphere-cli entproto --path ./internal/pkg/database/ent/schema --proto ./proto/entpb
+
+# 3. Generate database code
+make gen/db
+
+# 4. Generate API code
+make gen/proto
+```
+
+## Integration with Make
+
+Sphere projects use Makefiles to orchestrate common tasks. The CLI integrates well with these targets:
+
+```makefile
+# Generate database code from Ent schemas
+gen/db:
+	sphere-cli entproto
+	go generate ./internal/pkg/database/ent
+
+# Create a new service
+service/%:
+	sphere-cli service proto --name $* --package api.v1
+	sphere-cli service golang --name $* --package api.v1
+```
+
+## Best Practices
+
+1. **Use consistent naming**: Follow Go naming conventions for services and packages
+2. **Organize proto files**: Keep related messages and services in appropriate packages
+3. **Version your APIs**: Use versioned packages (e.g., `api.v1`, `api.v2`) for backward compatibility
+4. **Document your protos**: Add comments to your proto files for better generated documentation
+5. **Run generation regularly**: Use `make gen/all` frequently to keep generated code up to date
+
+## Common Issues and Solutions
+
+### Module Path Mismatches
+
+If you need to change the module path after project creation:
+
+```shell
+sphere-cli rename --old github.com/old/path --new github.com/new/path
+```
+
+### Missing Dependencies
+
+If you encounter import errors, ensure all dependencies are properly installed:
+
+```shell
+make install  # Install required tools
+make init     # Initialize dependencies
+```
+
+### Stale Generated Code
+
+If generated code seems out of sync:
+
+```shell
+make clean    # Clean generated files
+make gen/all  # Regenerate everything
+```
+
+## See Also
+
+- [Creating Your First Project](../../getting-started/creating-your-first-project) - Complete project setup guide
+- [Project Structure](../../concepts/project-structure) - Understanding the generated project layout
+- [Code Generators](../generators) - Details about protoc plugins used by sphere-cli
 
