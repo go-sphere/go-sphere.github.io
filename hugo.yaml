@@ -83,6 +83,7 @@ params:
     displayLogo: true
     logo:
       path: images/sphere.png
+      width: 35
     width: wide
   theme:
     default: system
