@@ -25,8 +25,6 @@ layout: hextra-home
 {{< hextra/hero-button text="Get Started" link="docs/getting-started/quickstart" >}}
 </div>
 
-<div class="hx:mt-6"></div>
-
 {{< hextra/feature-grid >}}
   {{< hextra/feature-card
     title="Contracts First"

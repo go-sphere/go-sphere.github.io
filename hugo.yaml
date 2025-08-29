@@ -1,9 +1,13 @@
 baseURL: https://go-sphere.github.io/
 languageCode: en-us
 title: Sphere
+enableRobotsTXT: true
+enableGitInfo: true
+hasCJKLanguage: true
 module:
   imports:
     - path: github.com/imfing/hextra
+enableInlineShortcodes: true
 menu:
   main:
     - name: Documentation
@@ -78,8 +82,7 @@ params:
     displayTitle: true
     displayLogo: true
     logo:
-      path: images/logo.svg
-      dark: images/logo-dark.svg
+      path: images/sphere.png
     width: wide
   theme:
     default: system
@@ -97,6 +100,9 @@ params:
     flexsearch:
       index: content
       tokenize: forward
+  editURL:
+    enable: true
+    base: "https://github.com/go-sphere/go-sphere.github.io/edit/master/content"
   blog:
     list:
       displayTags: true
