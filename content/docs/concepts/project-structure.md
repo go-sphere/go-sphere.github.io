@@ -1,8 +1,17 @@
 ---
-title: Project Layout
+title: Project Structure
+weight: 10
+aliases:
+  - /docs/concepts/project-code-structure/
+  - /docs/concepts/project-layout/
 ---
 
-Sphere projects follow a pragmatic layout optimized for fast iteration while staying maintainable. The standard layout (`sphere-layout`) looks like this:
+A pragmatic structure that keeps code generation, server code, and business logic cleanly separated while staying fast to iterate on.
+
+Highlights
+- Clear separation: `internal/service`, `internal/biz`, `internal/pkg`, `cmd/server`
+- Data layer with Ent in `internal/pkg/database/ent`
+- API contracts in `proto/**` with buf and Make targets
 
 Top-Level
 - `api/`: Go files generated from `.proto` definitions
@@ -31,5 +40,5 @@ Make Targets
 - `run`, `run/swag`: Run main server and Swagger server
 
 When to Customize
-- You can adapt directories to your team’s preferences, but keeping the above separation helps codegen and tooling work smoothly.
+- Adapt directories to your team’s preferences, but keep the separation above so codegen and tooling remain smooth.
 

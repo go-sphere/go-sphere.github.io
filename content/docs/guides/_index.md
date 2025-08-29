@@ -3,5 +3,11 @@ title: Guides
 weight: 30
 ---
 
-Practical guidance for APIs, errors, and generation.
+Hands-on topics and best practices.
 
+<!--more-->
+
+{{< cards >}}
+  {{< card link="api-definitions" title="API Definitions" icon="markdown" >}}
+  {{< card link="error-handling" title="Error Handling" icon="variable" >}}
+{{< /cards >}}

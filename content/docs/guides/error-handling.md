@@ -21,7 +21,7 @@ enum TestError {
 ```
 
 Generate and Use in Go
-- Add the plugin to `buf.gen.yaml` (see Toolchain → protoc-gen-sphere-errors)
+- Add the plugin to `buf.gen.yaml` (see Components → Generators → protoc-gen-sphere-errors)
 - After generation, use the typed helpers in your services:
 
 ```go
@@ -39,7 +39,6 @@ Why This Works Well
 - Strongly typed usage in Go with helpful helpers
 - Stable mapping to consistent HTTP error responses for clients
 
-See Also
-- Toolchain → protoc-gen-sphere-errors for setup and flags
+- See Also
+- Components → Generators → protoc-gen-sphere-errors for setup and flags
 - Guides → API Definitions for endpoint conventions
-

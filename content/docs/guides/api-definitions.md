@@ -49,6 +49,5 @@ Practical Tips
 - Avoid `oneof` in exposed HTTP request/response messages due to JSON codec limitations
 
 See Also
-- Toolchain → protoc-gen-sphere for generating HTTP handlers
-- Toolchain → protoc-gen-sphere-binding for tag injection
-
+- Components → Generators → protoc-gen-sphere for generating HTTP handlers
+- Components → Generators → protoc-gen-sphere-binding for tag injection

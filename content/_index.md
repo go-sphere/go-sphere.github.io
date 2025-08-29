@@ -1,20 +1,55 @@
-Sphere
+---
+title: Sphere
+layout: hextra-home
 ---
 
-**Sphere** is a pragmatic Go backend toolkit centered around a clean monolithic template and a small toolchain that automates the boring parts: schema, API contracts, server stubs, Swagger, and even TypeScript clients. Start simple, scale when needed.
+{{< hextra/hero-badge >}}
+  <div class="hx:w-2 hx:h-2 hx:rounded-full hx:bg-primary-400"></div>
+  <span>Free, open source</span>
+  {{< icon name="arrow-circle-right" attributes="height=14" >}}
+{{< /hextra/hero-badge >}}
 
-- Core: `sphere` 
-- Template: `sphere-layout`
-- Toolchain: 
-    - `sphere-cli`
-    - `protoc-gen-sphere`
-    - `protoc-gen-route`
-    - `protoc-gen-sphere-binding`
-    - `protoc-gen-sphere-errors`
+<div class="hx:mt-6 hx:mb-6">
+{{< hextra/hero-headline >}}
+  Build pragmatic Go backends&nbsp;<br class="hx:sm:block hx:hidden" />with Sphere
+{{< /hextra/hero-headline >}}
+</div>
 
-What you build:
-- Define entities with Ent and APIs with Protobuf
-- Generate Go handlers, Swagger, error types, and client SDKs
-- Compose services with Gin + Wire; deploy as a single binary
+<div class="hx:mb-12">
+{{< hextra/hero-subtitle >}}
+  Monolithic-first toolkit with codegen for contracts, errors, stubs, and clients
+{{< /hextra/hero-subtitle >}}
+</div>
 
-[Get started in the docs](./docs/)
+<div class="hx:mb-6">
+{{< hextra/hero-button text="Get Started" link="docs/getting-started" >}}
+</div>
+
+<div class="hx:mt-6"></div>
+
+{{< hextra/feature-grid >}}
+  {{< hextra/feature-card
+    title="Contracts First"
+    subtitle="Define APIs in Protobuf and entities in Ent; generate Go handlers, routers, bindings, and clients."
+  >}}
+  {{< hextra/feature-card
+    title="Monolith-First Template"
+    subtitle="Start with a single binary using Gin + Wire; evolve to multi-service when needed."
+  >}}
+  {{< hextra/feature-card
+    title="Code Generation"
+    subtitle="protoc-gen-sphere, protoc-gen-route, protoc-gen-sphere-binding, and protoc-gen-sphere-errors automate server, routing, tags, and typed errors."
+  >}}
+  {{< hextra/feature-card
+    title="Typed Errors"
+    subtitle="Define error enums in .proto; get consistent HTTP JSON with status, code, reason, and message."
+  >}}
+  {{< hextra/feature-card
+    title="Swagger & Clients"
+    subtitle="Generate OpenAPI from contracts and optional TypeScript SDKs for frontends."
+  >}}
+  {{< hextra/feature-card
+    title="CLI & Layout"
+    subtitle="sphere-cli and sphere-layout bootstrap projects with Makefile workflows and a sane project structure."
+  >}}
+{{< /hextra/feature-grid >}}

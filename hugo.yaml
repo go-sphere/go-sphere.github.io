@@ -6,84 +6,69 @@ module:
     - path: github.com/imfing/hextra
 menu:
   main:
-    # Top nav: send users to Docs root like Hextra example
     - name: Docs
       pageRef: /docs
       weight: 10
     - name: GitHub
       url: https://github.com/go-sphere
       weight: 90
-
 params:
   description: Modern, responsive, batteries-included Hugo theme for creating beautiful static websites.
-
   externalLinkDecoration: true
-
   banner:
     key: 'announcement-v0_10'
-
   navbar:
     displayTitle: true
     displayLogo: true
     logo:
       path: images/logo.svg
       dark: images/logo-dark.svg
-      # width: 40
-      # height: 20
-      # link: /
     width: wide
-
   theme:
-    # light | dark | system
     default: system
     displayToggle: true
-
   footer:
     enable: true
     displayCopyright: false
     displayPoweredBy: false
     width: normal
-
-  # Display the last modification date
   displayUpdatedDate: true
   dateFormat: "January 2, 2006"
-
-  # Search
-  # flexsearch is enabled by default
   search:
-    enable: true
+    enable: false
     type: flexsearch
-
     flexsearch:
-      # index page by: content | summary | heading | title
       index: content
-      # full | forward | reverse | strict
-      # https://github.com/nextapps-de/flexsearch/#tokenizer-prefix-search
       tokenize: forward
-
   blog:
     list:
       displayTags: true
-      # date | lastmod | publishDate | title | weight
       sortBy: date
       sortOrder: desc # or "asc"
-      # Pagination
       pagerSize: 20
-
     article:
       displayPagination: true
-
   toc:
     displayTags: true
-
   highlight:
     copy:
       enable: true
-      # hover | always
       display: hover
-
   page:
-    # full (100%), wide (90rem), normal (80rem)
     width: normal
-    # tabs:
-    #   sync: true
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  asciidocExt:
+    attributes: {}
+    backend: html5
+    extensions: []
+    failureLevel: fatal
+    noHeaderOrFooter: true
+    preserveTOC: false
+    safeMode: unsafe
+    sectionNumbers: false
+    trace: false
+    verbose: false
+    workingFolderCurrent: false
