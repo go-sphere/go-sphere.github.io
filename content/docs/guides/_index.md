@@ -1,6 +1,6 @@
 ---
 title: Guides
-weight: 30
+weight: 40
 ---
 
 Hands-on topics and best practices.

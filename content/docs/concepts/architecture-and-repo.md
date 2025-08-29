@@ -1,6 +1,6 @@
 ---
 title: Architecture & Repository Strategy
-weight: 40
+weight: 25
 aliases:
   - /docs/concepts/microservice-architecture/
   - /docs/concepts/code-repository-types/

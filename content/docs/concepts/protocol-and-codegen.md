@@ -1,6 +1,6 @@
 ---
 title: Protocol & Codegen
-weight: 20
+weight: 23
 aliases:
   - /docs/concepts/protobuf-protocol/
   - /docs/concepts/code-generation-engine/

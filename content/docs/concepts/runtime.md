@@ -1,5 +1,6 @@
 ---
 title: Runtime & Server
+weight: 24
 ---
 
 Sphere’s HTTP layer builds on Gin with small helpers to keep handlers concise and error responses consistent.

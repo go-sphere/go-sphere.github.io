@@ -1,5 +1,6 @@
 ---
 title: Error Handling
+weight: 42
 ---
 
 Sphere provides a powerful mechanism for generating typed, consistent error-handling code directly from your `.proto` definitions. By defining your errors as enums, you can ensure that error codes, HTTP statuses, and messages are standardized across your application.

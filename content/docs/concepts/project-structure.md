@@ -1,6 +1,6 @@
 ---
 title: Project Structure
-weight: 10
+weight: 21
 aliases:
   - /docs/concepts/project-code-structure/
   - /docs/concepts/project-layout/

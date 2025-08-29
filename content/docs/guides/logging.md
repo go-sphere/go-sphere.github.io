@@ -1,6 +1,6 @@
 ---
 title: Logging
-weight: 30
+weight: 43
 ---
 
 Sphere provides a flexible and powerful logging system built on top of `go.uber.org/zap`, a high-performance structured logger. It supports multiple outputs, including console and file, and is designed for both local development and production environments.

@@ -1,6 +1,6 @@
 ---
 title: Proto Packages
-weight: 30
+weight: 22
 ---
 
 Sphere provides several core proto packages that extend Protobuf with specialized annotations for HTTP binding, error handling, and method options. These packages enable the code generation pipeline and provide the foundation for Sphere's contract-first approach.

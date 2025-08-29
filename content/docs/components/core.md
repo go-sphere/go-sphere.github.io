@@ -1,6 +1,6 @@
 ---
 title: Core
-weight: 10
+weight: 33
 ---
 
 Sphere Core repositories and what they provide.

@@ -1,6 +1,6 @@
 ---
 title: Quick Start
-weight: 10
+weight: 11
 aliases:
   - /docs/start/getting-started/
   - /docs/start/getting-started

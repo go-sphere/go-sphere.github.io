@@ -1,5 +1,6 @@
 ---
 title: API Definitions
+weight: 41
 ---
 
 Sphere allows you to define HTTP interfaces for your services using standard Protobuf definitions and `google.api.http` annotations. This document outlines the rules and conventions for mapping your gRPC methods to RESTful HTTP endpoints.

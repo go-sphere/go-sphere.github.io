@@ -1,6 +1,6 @@
 ---
 title: Sphere CLI
-weight: 10
+weight: 32
 ---
 
 Sphere CLI (`sphere-cli`) is a command-line tool designed to streamline the development of [Sphere](https://github.com/go-sphere/sphere) projects. It helps you create new projects, generate service code, manage Protobuf definitions, and perform other common development tasks.
