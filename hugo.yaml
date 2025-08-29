@@ -6,14 +6,71 @@ module:
     - path: github.com/imfing/hextra
 menu:
   main:
-    - name: Docs
+    - name: Documentation
       pageRef: /docs
+      weight: 1
+    - name: Toolchains
+      identifier: toolchains
+      weight: 2
+    - name: sphere ↗
+      parent: toolchains
+      url: https://github.com/go-sphere/sphere
       weight: 10
+      params:
+        type: link
+        icon: beaker
+    - name: sphere-cli ↗
+      parent: toolchains
+      url: https://github.com/go-sphere/sphere-cli
+      weight: 11
+      params:
+        type: link
+        icon: terminal
+    - name: sphere-layout ↗
+      parent: toolchains
+      url: https://github.com/go-sphere/sphere-layout
+      weight: 11
+      params:
+        type: link
+        icon: terminal
+    - name: protoc-gen-route ↗
+      parent: toolchains
+      url: https://github.com/go-sphere/protoc-gen-route
+      weight: 20
+      params:
+        type: link
+        icon: terminal
+    - name: protoc-gen-sphere ↗
+      parent: toolchains
+      url: https://github.com/go-sphere/protoc-gen-sphere
+      weight: 21
+      params:
+        type: link
+        icon: terminal
+    - name: protoc-gen-sphere-binding ↗
+      parent: toolchains
+      url: https://github.com/go-sphere/protoc-gen-sphere-binding
+      weight: 22
+      params:
+        type: link
+        icon: terminal
+    - name: protoc-gen-sphere-errors ↗
+      parent: toolchains
+      url: https://github.com/go-sphere/protoc-gen-sphere-errors 
+      weight: 23
+      params:
+        type: link
+        icon: terminal
+    - name: Search
+      weight: 80
+      params:
+        type: search
     - name: GitHub
       url: https://github.com/go-sphere
       weight: 90
+      params:
+        icon: github
 params:
-  description: Modern, responsive, batteries-included Hugo theme for creating beautiful static websites.
   externalLinkDecoration: true
   banner:
     key: 'announcement-v0_10'
@@ -35,7 +92,7 @@ params:
   displayUpdatedDate: true
   dateFormat: "January 2, 2006"
   search:
-    enable: false
+    enable: true
     type: flexsearch
     flexsearch:
       index: content
