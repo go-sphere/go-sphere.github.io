@@ -3,12 +3,15 @@ title: Components
 weight: 30
 ---
 
-Explore Sphere’s building blocks and repositories.
+Explore Sphere's building blocks and repositories.
 
 <!--more-->
 
 {{< cards >}}
-  {{< card link="core" title="Core" icon="adjustments" >}}
-  {{< card link="cli" title="CLI" icon="document-duplicate" >}}
-  {{< card link="generators" title="Generators" icon="sparkles" >}}
+  {{< card link="sphere-cli" title="sphere-cli" icon="document-duplicate" >}}
+  {{< card link="protoc-gen-sphere" title="protoc-gen-sphere" icon="sparkles" >}}
+  {{< card link="protoc-gen-route" title="protoc-gen-route" icon="template" >}}
+  {{< card link="protoc-gen-sphere-binding" title="protoc-gen-sphere-binding" icon="document-duplicate" >}}
+  {{< card link="protoc-gen-sphere-errors" title="protoc-gen-sphere-errors" icon="variable" >}}
 {{< /cards >}}
+

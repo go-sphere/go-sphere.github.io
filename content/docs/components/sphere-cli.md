@@ -1,5 +1,5 @@
 ---
-title: Sphere CLI
+title: sphere-cli
 weight: 32
 ---
 
