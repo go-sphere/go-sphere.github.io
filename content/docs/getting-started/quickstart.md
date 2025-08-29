@@ -9,8 +9,6 @@ aliases:
   - /docs/getting-started/creating-your-first-project
 ---
 
-# Get Started with Sphere
-
 Sphere is a pragmatic Go backend toolkit centered on a clean monolithic template and a small toolchain that automates schema, API contracts, server stubs, Swagger, and even TypeScript clients.
 
 What you build:
