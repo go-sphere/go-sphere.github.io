@@ -1,6 +1,6 @@
 ---
 title: sphere-cli
-weight: 32
+weight: 31
 ---
 
 Sphere CLI (`sphere-cli`) is a command-line tool designed to streamline the development of [Sphere](https://github.com/go-sphere/sphere) projects. It helps you create new projects, generate service code, manage Protobuf definitions, and perform other common development tasks.
@@ -139,70 +139,10 @@ Renames the Go module path across the entire repository. This is useful when you
 sphere-cli rename --old <old-module-path> --new <new-module-path>
 ```
 
-## Workflow Examples
+## Common Workflows
 
-### Creating a New Project
-
-```shell
-# 1. Create the project
-sphere-cli create --name myapp --module github.com/myorg/myapp
-
-# 2. Navigate to the project
-cd myapp
-
-# 3. Initialize dependencies
-make init
-
-# 4. Generate initial code
-make gen/all
-```
-
-### Adding a New Service
-
-```shell
-# 1. Generate the proto file
-sphere-cli service proto --name UserService --package api.v1
-
-# 2. Edit the generated proto file to add methods
-# vim proto/api/v1/user_service.proto
-
-# 3. Generate the Go implementation
-sphere-cli service golang --name UserService --package api.v1 --mod github.com/myorg/myapp
-
-# 4. Generate all code
-make gen/all
-```
-
-### Working with Ent Schemas
-
-```shell
-# 1. Define your Ent schemas in internal/pkg/database/ent/schema/
-
-# 2. Convert Ent schemas to proto
-sphere-cli entproto --path ./internal/pkg/database/ent/schema --proto ./proto/entpb
-
-# 3. Generate database code
-make gen/db
-
-# 4. Generate API code
-make gen/proto
-```
-
-## Integration with Make
-
-Sphere projects use Makefiles to orchestrate common tasks. The CLI integrates well with these targets:
-
-```makefile
-# Generate database code from Ent schemas
-gen/db:
-	sphere-cli entproto
-	go generate ./internal/pkg/database/ent
-
-# Create a new service
-service/%:
-	sphere-cli service proto --name $* --package api.v1
-	sphere-cli service golang --name $* --package api.v1
-```
+- Quick project setup and generation: ../../getting-started/quickstart
+- Day-to-day development loop: ../../getting-started/workflow
 
 ## Best Practices
 
@@ -245,4 +185,3 @@ make gen/all  # Regenerate everything
 - [Quick Start](../../getting-started/quickstart) - Complete project setup guide
 - [Project Structure](../../concepts/project-structure) - Understanding the generated project layout
 - [Components Overview](../) - Details about protoc plugins used by sphere-cli
-

@@ -11,13 +11,13 @@ layout: hextra-home
 
 <div class="hx:mt-6 hx:mb-6">
 {{< hextra/hero-headline >}}
-  Build pragmatic Go backends&nbsp;<br class="hx:sm:block hx:hidden" />with Sphere
+  A pragmatic Go toolkit that starts&nbsp;<br class="hx:sm:block hx:hidden" />monolithic and scales to microservices
 {{< /hextra/hero-headline >}}
 </div>
 
 <div class="hx:mb-12">
 {{< hextra/hero-subtitle >}}
-  Monolithic-first toolkit with codegen for contracts, errors, stubs, and clients
+  Define once in Protobuf, generate everything: handlers, routes, errors, and clients
 {{< /hextra/hero-subtitle >}}
 </div>
 
@@ -27,27 +27,27 @@ layout: hextra-home
 
 {{< hextra/feature-grid >}}
   {{< hextra/feature-card
-    title="Contracts First"
-    subtitle="Define APIs in Protobuf and entities in Ent; generate Go handlers, routers, bindings, and clients."
+    title="Protocol-First Design"
+    subtitle="Define once in Protobuf, generate everywhere. Get Go handlers, HTTP routing, client SDKs, and OpenAPI docs from a single source of truth."
   >}}
   {{< hextra/feature-card
-    title="Monolith-First Template"
-    subtitle="Start with a single binary using Gin + Wire; evolve to multi-service when needed."
+    title="Pragmatic Monolith Template"
+    subtitle="Start simple with Gin + Wire + Ent in a single binary. Clean architecture that scales from MVP to microservices when needed."
   >}}
   {{< hextra/feature-card
-    title="Code Generation"
-    subtitle="protoc-gen-sphere, protoc-gen-route, protoc-gen-sphere-binding, and protoc-gen-sphere-errors automate server, routing, tags, and typed errors."
+    title="Complete Code Generation"
+    subtitle="Automated toolchain with protoc-gen-sphere ecosystem: server stubs, HTTP routing, field binding, typed errors, and validation."
   >}}
   {{< hextra/feature-card
-    title="Typed Errors"
-    subtitle="Define error enums in .proto; get consistent HTTP JSON with status, code, reason, and message."
+    title="Structured Error Handling"
+    subtitle="Define error enums in protobuf with automatic HTTP status mapping. Get consistent JSON responses with code, reason, and message."
   >}}
   {{< hextra/feature-card
-    title="Swagger & Clients"
-    subtitle="Generate OpenAPI from contracts and optional TypeScript SDKs for frontends."
+    title="Full-Stack Development"
+    subtitle="Generate Swagger documentation, TypeScript SDKs, and validation schemas. Bridge backend and frontend with type safety."
   >}}
   {{< hextra/feature-card
-    title="CLI & Layout"
-    subtitle="sphere-cli and sphere-layout bootstrap projects with Makefile workflows and a sane project structure."
+    title="Developer Experience"
+    subtitle="sphere-cli for project scaffolding, Makefile workflows, and clean project structure. Focus on business logic, not boilerplate."
   >}}
 {{< /hextra/feature-grid >}}

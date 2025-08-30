@@ -1,6 +1,6 @@
 ---
 title: protoc-gen-sphere-errors
-weight: 37
+weight: 35
 ---
 
 `protoc-gen-sphere-errors` is a protoc plugin that generates error handling code from `.proto` files. It is designed to inspect enum definitions within your protobuf files and automatically generate corresponding error handling code based on the sphere errors framework. This plugin creates Go code that provides structured error handling with HTTP status codes, error codes, and customizable messages.
@@ -199,3 +199,8 @@ When used with Sphere's HTTP server utilities, these errors are automatically co
 - Sphere's Gin layer maps these to structured JSON with correct HTTP status
 - Pair with a global error parser if you need to merge validation/notfound/custom errors
 - The generated errors integrate seamlessly with Sphere's server utilities for consistent API responses
+
+## See Also
+
+- Guides: ../../guides/error-handling
+- Concepts: ../../concepts/protocol-and-codegen

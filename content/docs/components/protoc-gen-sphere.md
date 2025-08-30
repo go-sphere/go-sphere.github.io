@@ -1,6 +1,6 @@
 ---
 title: protoc-gen-sphere
-weight: 38
+weight: 32
 ---
 
 Generates HTTP server code from `.proto` service definitions, using `google.api.http` annotations and Sphere server utilities (Gin-based).
@@ -46,3 +46,9 @@ Notes
 - Works hand-in-hand with Sphere’s Gin helpers: `WithJson`, `ShouldBindJSON`, `ShouldBindUri`, `ShouldBindQuery`
 - Pair with `protoc-gen-sphere-binding` to inject binding tags into generated structs
 
+## See Also
+
+- Guides: ../../guides/api-definitions
+- Component: ./protoc-gen-sphere-binding
+- Component: ./protoc-gen-sphere-errors
+- Concepts: ../../concepts/protocol-and-codegen

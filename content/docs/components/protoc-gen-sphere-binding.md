@@ -1,6 +1,6 @@
 ---
 title: protoc-gen-sphere-binding
-weight: 36
+weight: 34
 ---
 
 `protoc-gen-sphere-binding` is a protoc plugin that generates Go struct tags for Sphere binding from `.proto` files. It is designed to inspect service definitions within your protobuf files and automatically generate corresponding Go struct tags based on sphere binding annotations.
@@ -278,3 +278,8 @@ func inspectTags() {
 }
 ```
 
+## See Also
+
+- Guides: ../../guides/api-definitions
+- Component: ./protoc-gen-sphere
+- Concepts: ../../concepts/protocol-and-codegen

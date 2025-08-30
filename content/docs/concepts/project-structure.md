@@ -38,153 +38,17 @@ The project structure is designed to:
 └── swagger             # Generated Swagger/OpenAPI documentation
 ```
 
-## Key Directories Explained
+## Key Directories
 
-### `api/`
-Contains Go files generated from `.proto` definitions. This directory is managed by code generation and should not be edited manually.
+At a glance, common top-level directories:
 
-**Contents:**
-- Generated Go structs for protobuf messages
-- Service interfaces
-- HTTP handlers (when using protoc-gen-sphere)
-- Error types (when using protoc-gen-sphere-errors)
-
-### `cmd/`
-Application entry points and command-line tools.
-
-**Structure:**
-- `cmd/app/`: Main application entry point
-- `cmd/tools/`: Developer utilities and migration tools
-
-### `internal/`
-Private application code that cannot be imported by external packages.
-
-#### `internal/biz/`
-Business logic layer containing use cases and domain logic. This layer is independent of transport protocols and external dependencies.
-
-**Responsibilities:**
-- Core business rules and validation
-- Use case orchestration
-- Domain entity manipulation
-- Transaction management
-
-#### `internal/config/`
-Configuration management including loading, validation, and type definitions.
-
-**Features:**
-- Environment-based configuration
-- Validation of required settings
-- Type-safe configuration structs
-
-#### `internal/pkg/`
-Shared internal packages providing common functionality.
-
-**Common packages:**
-- `database/`: Database clients and utilities
-- `auth/`: Authentication and authorization
-- `middleware/`: HTTP middleware
-- `utils/`: Common utilities
-
-#### `internal/pkg/database/ent/`
-Database layer using Ent ORM, including:
-- Schema definitions in `schema/`
-- Generated client code
-- Custom queries and mutations
-- Database migrations
-
-#### `internal/server/`
-HTTP and gRPC server implementations, including:
-- Server setup and configuration
-- Middleware registration
-- Route registration
-- Health checks and metrics
-
-#### `internal/service/`
-Service layer that implements generated protobuf service interfaces. This layer handles:
-- Request validation and parsing
-- Calling business logic
-- Response formatting
-- Error handling
-
-### `proto/`
-Protobuf source files organized by domain and version.
-
-**Recommended structure:**
-```
-proto/
-├── shared/
-│   └── v1/
-│       ├── common.proto
-│       └── user.proto
-└── api/
-    └── v1/
-        ├── user_service.proto
-        └── auth_service.proto
-```
-
-### `devops/`
-Infrastructure and deployment configuration.
-
-**Contents:**
-- Docker files and docker-compose.yml
-- Kubernetes manifests
-- CI/CD pipeline definitions
-- Infrastructure as Code templates
-
-### `scripts/`
-Development and build automation scripts.
-
-**Common scripts:**
-- TypeScript SDK generation
-- Database migration scripts
-- Development environment setup
-
-### `swagger/`
-Generated OpenAPI/Swagger documentation and related assets.
-
-## Make Targets
-
-The project includes a comprehensive Makefile with the following key targets:
-
-### Code Generation
-- `make gen/wire`: Generate Wire dependency injection code
-- `make gen/conf`: Generate example configuration files
-- `make gen/db`: Generate Ent code from schemas
-- `make gen/proto`: Generate protobuf Go code and run protoc plugins
-- `make gen/docs`: Generate Swagger documentation
-- `make gen/all`: Run all code generation targets
-- `make gen/dts`: Generate TypeScript SDK from Swagger
-
-### Build and Run
-- `make build`: Build binary for current architecture
-- `make build/all`: Build for all supported platforms
-- `make run`: Run the application
-- `make run/swag`: Run the Swagger documentation server
-
-### Development
-- `make clean`: Clean generated code and build files
-- `make fmt`: Run code formatter
-- `make lint`: Run linters
-- `make install`: Install development dependencies
-- `make init`: Initialize all dependencies
-
-### Deployment
-- `make build/docker`: Build Docker image
-- `make build/multi-docker`: Build multi-architecture Docker image
-- `make deploy`: Deploy binary
-
-## Code Generation Workflow
-
-The typical development workflow involves these steps:
-
-1. **Define schemas** in `internal/pkg/database/ent/schema/`
-2. **Run database generation**: `make gen/db`
-3. **Define APIs** in `proto/` files
-4. **Generate API code**: `make gen/proto`
-5. **Implement services** in `internal/service/`
-6. **Implement business logic** in `internal/biz/`
-7. **Generate documentation**: `make gen/docs`
-8. **Wire dependencies**: `make gen/wire`
+- `api/`: Generated Go from `.proto` (do not edit)
+- `cmd/`: Entrypoints and developer tools
+- `internal/`: Private application code (service, biz, data, server)
+- `proto/`: Protobuf contracts
+- `devops/`: CI/CD and infrastructure
+- `scripts/`: Developer scripts and helpers
+- `swagger/`: Generated OpenAPI assets
 
 ## Layer Responsibilities
 
@@ -212,32 +76,10 @@ The typical development workflow involves these steps:
 - Schema management
 - Database transactions
 
-## Best Practices
+## Notes
 
-### Directory Organization
-1. **Keep generated code separate**: Never edit files in `api/` manually
-2. **Use internal packages**: Leverage Go's internal package visibility
-3. **Group by domain**: Organize proto files and services by business domain
-4. **Version your APIs**: Use versioned packages (v1, v2, etc.)
-
-### Code Organization
-1. **Thin service layer**: Keep service implementations focused on API contracts
-2. **Rich business layer**: Put core logic in the business layer
-3. **Minimal data layer**: Keep data access simple and focused
-4. **Dependency direction**: Dependencies should flow inward (service → biz → data)
-
-### Development Workflow
-1. **Generate frequently**: Run `make gen/all` regularly during development
-2. **Clean before release**: Use `make clean && make gen/all` before commits
-3. **Test thoroughly**: Include tests for all layers
-4. **Document changes**: Update proto comments for API documentation
-
-## Customization
-
-The project structure is designed to be flexible. You can:
-
-- Add new directories under `internal/pkg/` for shared functionality
-- Organize proto files differently based on your domain model
+- Keep generated code under `api/` separate and unedited
+- Group proto and services by domain + version (e.g., `api.v1`)
 - Add custom Make targets for project-specific tasks
 - Modify the build process in the Makefile
 
@@ -253,4 +95,3 @@ If you're migrating from other project layouts:
 4. **From Hexagonal Architecture**: Map ports/adapters to service/biz layers
 
 The key is maintaining clear boundaries between transport, business logic, and data access while leveraging code generation for the transport layer.
-
