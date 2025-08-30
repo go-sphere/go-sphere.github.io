@@ -5,7 +5,7 @@ weight: 43
 
 Sphere provides a flexible and powerful logging system built on top of `go.uber.org/zap`, a high-performance structured logger. It supports multiple outputs, including console and file, and is designed for both local development and production environments.
 
-The core logging functionality can be found in the [`log`](https://github.com/go-sphere/sphere/tree/main/log) directory of the Sphere framework.
+The core logging functionality can be found in the [`log`](https://github.com/go-sphere/sphere/tree/master/log) directory of the Sphere framework.
 
 ## Configuration
 
