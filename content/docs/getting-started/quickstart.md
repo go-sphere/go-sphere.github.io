@@ -29,22 +29,12 @@ What you build:
 go install github.com/go-sphere/sphere-cli@latest
 ```
 
-**Install Protoc Plugins:**
-```bash
-go install github.com/go-sphere/protoc-gen-sphere@latest
-go install github.com/go-sphere/protoc-gen-route@latest
-go install github.com/go-sphere/protoc-gen-sphere-binding@latest
-go install github.com/go-sphere/protoc-gen-sphere-errors@latest
-```
-
 **Verify Installation:**
 ```bash
 sphere-cli --version || sphere-cli -h
-protoc-gen-sphere --version
-protoc-gen-route --version
-protoc-gen-sphere-binding --version
-protoc-gen-sphere-errors --version
 ```
+
+> **Note**: You don't need to manually install protoc plugins. After creating a project, run `make init` to automatically install all required dependencies including protoc plugins.
 
 ## Create Your First Project
 
@@ -57,11 +47,11 @@ sphere-cli create --name myproject --mod github.com/yourusername/myproject
 cd myproject
 ```
 
-This generates a new project with a clean structure based on [sphere-layout](https://github.com/go-sphere/sphere-layout).
+This generates a new project with a clean structure based on [sphere-layout](https://github.com/go-sphere/sphere-layout) and automatically installs all required protoc plugins and dependencies.
 
 ### 2. Define Database Schema (Ent)
 
-Create your database entities in `/internal/pkg/database/ent/schema`. For example, create `internal/pkg/database/ent/schema/user.go`:
+Create your database entities in `internal/pkg/database/schema/`. For example, create `internal/pkg/database/schema/user.go`:
 
 ```go
 package schema
@@ -100,8 +90,6 @@ syntax = "proto3";
 
 package shared.v1;
 
-option go_package = "myproject/api/shared/v1;sharedv1";
-
 message User {
   int64 id = 1;
   string name = 2;
@@ -117,8 +105,7 @@ syntax = "proto3";
 
 package api.v1;
 
-option go_package = "myproject/api/api/v1;apiv1";
-
+import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "shared/v1/user.proto";
 
@@ -138,13 +125,13 @@ service UserService {
 }
 
 message GetUserRequest {
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 message CreateUserRequest {
-  string name = 1;
-  string email = 2;
-  int32 age = 3;
+  string name = 1 [(buf.validate.field).required = true];
+  string email = 2 [(buf.validate.field).required = true];
+  int32 age = 3 [(buf.validate.field).int32.gt = 0];
 }
 ```
 

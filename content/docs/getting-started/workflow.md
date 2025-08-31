@@ -11,7 +11,7 @@ A typical day-to-day development cycle with Sphere follows this pattern:
 ## Core Development Loop
 
 1. **Model Your Data**
-   - Define Ent schemas in `internal/pkg/database/ent/schema/`
+   - Define Ent schemas in `internal/pkg/database/schema/`
    - Run `make gen/db` to generate database code
 
 2. **Define Your API**
@@ -44,6 +44,19 @@ make gen/docs
 # 5. Implement service methods
 # 6. Wire and run
 make gen/wire
+make run
+```
+
+**For a new project setup:**
+```bash
+# 1. Create project
+sphere-cli create --name myproject --mod github.com/user/myproject
+cd myproject
+
+# 2. Initialize all dependencies and tools
+make init
+
+# 3. Start development
 make run
 ```
 
