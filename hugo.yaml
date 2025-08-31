@@ -33,7 +33,14 @@ menu:
     - name: sphere-layout ↗
       parent: toolchains
       url: https://github.com/go-sphere/sphere-layout
-      weight: 11
+      weight: 12
+      params:
+        type: link
+        icon: terminal
+    - name: sphere-simple-layout ↗
+      parent: toolchains
+      url: https://github.com/go-sphere/sphere-simple-layout
+      weight: 13
       params:
         type: link
         icon: terminal
