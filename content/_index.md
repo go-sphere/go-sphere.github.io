@@ -11,13 +11,13 @@ layout: hextra-home
 
 <div class="hx:mt-6 hx:mb-6">
 {{< hextra/hero-headline >}}
-  A pragmatic Go toolkit that starts&nbsp;<br class="hx:sm:block hx:hidden" />monolithic and scales to microservices
+  Protobuf-first Go service framework&nbsp;<br class="hx:sm:block hx:hidden" />for definition-driven development
 {{< /hextra/hero-headline >}}
 </div>
 
 <div class="hx:mb-12">
 {{< hextra/hero-subtitle >}}
-  Define once in Protobuf, generate everything: handlers, routes, errors, and clients
+  Start monolithic, scale to microservices. Define once, generate everything with rapid tooling.
 {{< /hextra/hero-subtitle >}}
 </div>
 
