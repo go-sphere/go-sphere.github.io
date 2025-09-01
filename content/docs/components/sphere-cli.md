@@ -125,12 +125,6 @@ sphere-cli service golang --name <service-name> [--package <package-name>] [--mo
 sphere-cli service golang --name UserService --package api.v1 --mod github.com/myorg/myproject
 ```
 
-### `retags` (Deprecated)
-
-> **Note**: This command is deprecated. Use [`protoc-gen-sphere-binding`](protoc-gen-sphere-binding) instead.
-
-The `retags` command was used to inject struct tags into generated protobuf Go files, but this functionality has been moved to the more robust `protoc-gen-sphere-binding` plugin.
-
 ### `rename`
 
 Renames the Go module path across the entire repository. This is useful when you need to change the module path after creating a project.
