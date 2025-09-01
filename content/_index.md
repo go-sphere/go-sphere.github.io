@@ -3,7 +3,7 @@ title: Sphere
 layout: hextra-home
 ---
 
-{{< hextra/hero-container image="images/sphere.png">}}
+{{< hextra/hero-container image="images/sphere.png" imageClass="hx:hidden hx:sm:block" >}}
 {{< hextra/hero-badge link="https://github.com/TBXark" >}}
   <div class="hx:w-2 hx:h-2 hx:rounded-full hx:bg-primary-400"></div>
   <span>Made&nbsp;with&nbsp;love&nbsp;by&nbsp;TBXark</span>
@@ -12,7 +12,8 @@ layout: hextra-home
 
 <div class="hx:mt-6 hx:mb-6">
 {{< hextra/hero-headline >}}
-  Protobuf-first Go service framework&nbsp;<br class="hx:sm:block hx:hidden" />for definition-driven development
+  Protobuf-first Go service framework&nbsp;
+  <br class="hx:sm:block hx:hidden" />for definition-driven development
 {{< /hextra/hero-headline >}}
 </div>
 
