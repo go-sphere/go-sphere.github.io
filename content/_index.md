@@ -27,7 +27,8 @@ layout: hextra-home
 </div>
 {{< /hextra/hero-container >}}
 
-{{< hextra/feature-grid >}}
+<div class="hx:mt-12">
+{{< hextra/feature-grid>}}
   {{< hextra/feature-card
     title="Protocol-First Design"
     subtitle="Define once in Protobuf, generate everywhere. Get Go handlers, HTTP routing, client SDKs, and OpenAPI docs from a single source of truth."
@@ -59,3 +60,4 @@ layout: hextra-home
     link="docs/components/sphere-cli"
   >}}
 {{< /hextra/feature-grid >}}
+</div>
