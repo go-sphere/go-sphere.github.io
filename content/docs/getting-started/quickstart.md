@@ -13,7 +13,7 @@ What you build:
 ## Prerequisites
 
 - Go 1.24+
-- Docker + Docker Compose  
+- Docker + Docker Compose  (Optional)
 - Node.js + npm (for TypeScript clients)
 
 ## Install Tooling

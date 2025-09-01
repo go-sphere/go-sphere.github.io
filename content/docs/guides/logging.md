@@ -3,13 +3,11 @@ title: Logging
 weight: 43
 ---
 
-Sphere provides a flexible and powerful logging system built on top of `go.uber.org/zap`, a high-performance structured logger. It supports multiple outputs, including console and file, and is designed for both local development and production environments.
-
-The core logging functionality can be found in the [`log`](https://github.com/go-sphere/sphere/tree/master/log) directory of the Sphere framework.
+Sphere provides a flexible logging system built on `go.uber.org/zap` for high-performance structured logging. It supports console and file outputs for both development and production environments.
 
 ## Configuration
 
-The logger is configured through the main `config.json` file in your project root. The configuration allows you to define log levels and outputs.
+Configure logging through your `config.json` file:
 
 ```json
 {
@@ -28,24 +26,21 @@ The logger is configured through the main `config.json` file in your project roo
 }
 ```
 
-### Configuration Fields
+### Configuration Options
 
-* `level`: The minimum log level to record (e.g., `debug`, `info`, `warn`, `error`).
-* `console`: Console logging options.
-    * `disable`: Set to `true` to turn off console output (default: `false`)
-* `file`: File logging options. If this section is omitted, file logging is disabled.
-    * `file_name`: The path to the log file.
-    * `max_size`: The maximum size in megabytes of the log file before it gets rotated.
-    * `max_backups`: The maximum number of old log files to retain.
-    * `max_age`: The maximum number of days to retain old log files.
+- `level`: Minimum log level (`debug`, `info`, `warn`, `error`)
+- `console.disable`: Disable console output (default: `false`)
+- `file`: File logging configuration (optional)
+  - `file_name`: Log file path
+  - `max_size`: Max file size in MB before rotation
+  - `max_backups`: Number of backup files to keep
+  - `max_age`: Days to retain old files
 
 ## Basic Usage
 
-Sphere provides a global logger that can be used anywhere in your application.
-
 ### Standard Logging
 
-You can use the global functions for standard logging:
+Use global logging functions with structured fields:
 
 ```go
 package main
@@ -53,216 +48,199 @@ package main
 import "github.com/go-sphere/sphere/log"
 
 func main() {
-	log.Debug("This is a debug message")
-	log.Info("This is an info message", log.String("user", "test"))
-	log.Warn("This is a warning")
-	log.Error("This is an error", log.Err(fmt.Errorf("an error occurred")))
+    log.Debug("Debug message")
+    log.Info("User created", log.String("user", "john"))
+    log.Warn("Warning message")
+    log.Error("Error occurred", log.Err(err))
 }
+```
+
+### Printf-style Logging
+
+You can also use formatted logging:
+
+```go
+log.Infof("User %s created with ID %d", username, userID)
+log.Errorf("Failed to connect to %s: %v", host, err)
 ```
 
 ### Structured Logging
 
-To add structured context to your logs, you can use `log.With` to create a new logger instance with predefined fields.
+Add context using structured fields:
 
 ```go
-logger := log.With(log.WithAttrs(map[string]any{"module": "api"}))
-
-logger.Info("User lookup successful")
-// Output will include {"service": "UserService", "traceId": "xyz-123", "message": "User lookup successful"}
+log.Info("User operation",
+    log.String("user_id", "123"),
+    log.String("action", "login"),
+    log.Duration("duration", time.Since(start)))
 ```
 
-### Common Log Fields
-
-Sphere provides convenient helper functions for common log fields:
+### Available Field Types
 
 ```go
-// User-related fields
-log.Info("User created", 
-    log.String("userId", "123"),
-    log.String("email", "user@example.com"))
-
-// Error logging
-log.Error("Database connection failed", 
-    log.Err(err),
-    log.String("database", "postgresql"),
-    log.Duration("timeout", 5*time.Second))
-
-// HTTP request logging
-log.Info("HTTP request processed",
-    log.String("method", "POST"),
-    log.String("path", "/api/users"),
-    log.Int("status", 201),
-    log.Duration("duration", 150*time.Millisecond))
+log.String("key", "value")          // String field
+log.Int("count", 42)                // Integer field  
+log.Int64("timestamp", time.Now().Unix())  // 64-bit integer
+log.Float64("score", 98.5)          // Float field
+log.Bool("success", true)           // Boolean field
+log.Duration("elapsed", duration)    // Time duration
+log.Time("created_at", time.Now())  // Time field
+log.Err(err)                        // Error field (key="error")
+log.Any("data", complexObject)      // Any type
 ```
 
-## Service Integration
+## Logger Instances
 
-### In HTTP Handlers
-
-Use structured logging in your HTTP handlers to track requests:
+Create logger instances with additional context:
 
 ```go
-func (s *UserService) CreateUser(c *gin.Context) {
-    logger := log.With(
-        log.WithAttrs(map[string]any{
-            "service": "UserService",
-            "traceId": c.GetString("traceId"), // assuming traceId is set in context
-        })
-    )
+// Create a logger with predefined attributes
+logger := log.With(log.WithAttrs(map[string]any{
+    "service": "user-service",
+    "version": "1.0.0",
+}))
+
+logger.Info("Service started")
+// Output includes: {"service": "user-service", "version": "1.0.0", "message": "Service started"}
+```
+
+### Multiple Options
+
+You can combine multiple options:
+
+```go
+logger := log.With(
+    log.WithName("user-service"),
+    log.WithAttrs(map[string]any{"component": "api"}),
+    log.AddCaller(),
+)
+
+logger.Info("Processing request")
+```
+
+## Usage Examples
+
+### HTTP Handler Logging
+
+```go
+func (h *UserHandler) CreateUser(c *gin.Context) {
+    logger := log.With(log.WithAttrs(map[string]any{
+        "handler": "CreateUser",
+        "trace_id": c.GetString("trace_id"),
+    }))
     
-    logger.Info("Creating user request received")
+    logger.Info("Request received")
     
     var req CreateUserRequest
     if err := c.ShouldBindJSON(&req); err != nil {
-        logger.Error("Failed to bind request", log.Err(err))
+        logger.Error("Invalid request", log.Err(err))
         c.JSON(400, gin.H{"error": "Invalid request"})
         return
     }
     
-    user, err := s.userBiz.CreateUser(c.Request.Context(), &req)
+    user, err := h.userService.Create(c.Request.Context(), &req)
     if err != nil {
         logger.Error("Failed to create user", 
             log.Err(err),
             log.String("email", req.Email))
-        c.JSON(500, gin.H{"error": "Internal server error"})
+        c.JSON(500, gin.H{"error": "Internal error"})
         return
     }
     
-    logger.Info("User created successfully", 
-        log.String("userId", user.ID),
+    logger.Info("User created", 
+        log.String("user_id", user.ID),
         log.String("email", user.Email))
     
     c.JSON(201, user)
 }
 ```
 
-### In Business Logic
-
-Add contextual logging to your business logic:
+### Business Logic Logging
 
 ```go
-func (b *UserBiz) CreateUser(ctx context.Context, req *CreateUserRequest) (*User, error) {
-    logger := log.With(
-        log.WithAttrs(map[string]any{
-            "module": "business",
-            "function": "CreateUser",
-        }),
-    )
+func (s *UserService) Create(ctx context.Context, req *CreateUserRequest) (*User, error) {
+    logger := log.With(log.WithAttrs(map[string]any{
+        "service": "UserService",
+        "method": "Create",
+    }))
     
-    logger.Debug("Validating user input", log.String("email", req.Email))
+    logger.Debug("Validating input", log.String("email", req.Email))
     
-    if err := b.validateEmail(req.Email); err != nil {
-        logger.Warn("Email validation failed", 
-            log.Err(err),
-            log.String("email", req.Email))
-        return nil, fmt.Errorf("invalid email: %w", err)
+    if err := s.validateEmail(req.Email); err != nil {
+        logger.Warn("Validation failed", log.Err(err))
+        return nil, err
     }
     
-    logger.Debug("Checking if user exists")
-    existing, err := b.userRepo.GetByEmail(ctx, req.Email)
+    user, err := s.repo.Create(ctx, req)
     if err != nil {
-        logger.Error("Database query failed", log.Err(err))
-        return nil, fmt.Errorf("failed to check existing user: %w", err)
+        logger.Error("Database error", log.Err(err))
+        return nil, err
     }
     
-    if existing != nil {
-        logger.Warn("User already exists", log.String("email", req.Email))
-        return nil, ErrUserAlreadyExists
-    }
-    
-    logger.Info("Creating new user", log.String("email", req.Email))
-    user, err := b.userRepo.Create(ctx, req)
-    if err != nil {
-        logger.Error("Failed to create user in database", log.Err(err))
-        return nil, fmt.Errorf("failed to create user: %w", err)
-    }
-    
-    logger.Info("User created successfully", 
-        log.String("userId", user.ID),
-        log.String("email", user.Email))
-    
+    logger.Info("User created", log.String("user_id", user.ID))
     return user, nil
 }
 ```
 
-## Log Levels
+## Best Practices
 
-Sphere supports the following log levels:
-
-### Debug
-Use for detailed diagnostic information, typically only of interest when diagnosing problems.
+### Log Levels
+- **Debug**: Detailed diagnostic information
+- **Info**: General application flow
+- **Warn**: Potentially harmful situations  
+- **Error**: Error events that don't stop the application
 
 ```go
-log.Debug("Processing user input", 
-    log.String("input", userInput),
-    log.Int("inputLength", len(userInput)))
+log.Debug("Processing input", log.Int("size", len(data)))
+log.Info("Server started", log.String("port", ":8080"))
+log.Warn("Rate limit approaching", log.String("user", userID))
+log.Error("Database error", log.Err(err))
 ```
 
-### Info
-Use for general informational messages that highlight the progress of the application.
+### Error Handling
+Always include error context:
 
 ```go
-log.Info("Server started", 
-    log.String("address", ":8080"),
-    log.String("environment", "production"))
-```
-
-### Warn
-Use for potentially harmful situations that are not necessarily errors.
-
-```go
-log.Warn("Rate limit approaching", 
-    log.String("userId", userID),
-    log.Int("currentRequests", currentReqs),
-    log.Int("limit", rateLimit))
-```
-
-### Error
-Use for error events that do not stop the application from running.
-
-```go
-log.Error("Failed to send email", 
-    log.Err(err),
-    log.String("recipient", email),
-    log.String("template", "welcome"))
-```
-
-## Performance Considerations
-
-### Use Appropriate Log Levels
-Set your log level appropriately for each environment:
-- **Development**: `debug` for detailed information
-- **Staging**: `info` for general application flow
-- **Production**: `warn` or `error` for minimal overhead
-
-### Structured Fields
-Use structured fields instead of string formatting:
-
-```go
-// Good - structured logging
-log.Info("User logged in", 
-    log.String("userId", userID),
-    log.String("ip", clientIP))
-
-// Avoid - string formatting
-log.Info(fmt.Sprintf("User %s logged in from %s", userID, clientIP))
-```
-
-### Conditional Logging
-For expensive log operations, check log level first:
-
-```go
-if log.IsDebugEnabled() {
-    expensiveData := generateExpensiveLogData()
-    log.Debug("Expensive debug info", log.Any("data", expensiveData))
+if err != nil {
+    log.Error("Operation failed",
+        log.Err(err),
+        log.String("operation", "user_creation"),
+        log.String("user_id", userID))
+    return err
 }
 ```
 
-## Log Collection and Monitoring
+### Performance Tips
+- Use appropriate log levels for each environment
+- Avoid logging sensitive data (passwords, tokens)
+- Use structured fields instead of string formatting
 
-### File-based Collection
+```go
+// Good - structured
+log.Info("User login", 
+    log.String("user_id", userID),
+    log.String("ip", clientIP))
 
-For simple log collection, you can use file output with log rotation:
+// Avoid - formatted strings  
+log.Info(fmt.Sprintf("User %s logged in from %s", userID, clientIP))
+```
+
+### Context Propagation
+Include relevant context in logs:
+
+```go
+logger := log.With(log.WithAttrs(map[string]any{
+    "request_id": getRequestID(ctx),
+    "user_id": getUserID(ctx),
+}))
+
+logger.Info("Processing request")
+```
+
+## Log Collection
+
+### File Rotation
+Configure automatic log rotation:
 
 ```json
 {
@@ -277,11 +255,8 @@ For simple log collection, you can use file output with log rotation:
 }
 ```
 
-### Simple Collection with Logdy
-
-For simple, real-time log viewing without a complex setup, you can use [Logdy](https://github.com/logdyhq/logdy-core). It's a lightweight tool that can stream logs directly to your browser.
-
-If your application is writing logs to `app.log`, you can start Logdy with the following command:
+### Simple Log Viewing with Logdy
+For development, use [Logdy](https://github.com/logdyhq/logdy-core) for real-time log viewing:
 
 ```bash
 tail -f app.log | logdy
@@ -289,30 +264,22 @@ tail -f app.log | logdy
 logdy follow app.log
 ```
 
-This is ideal for debugging during development or monitoring a single instance.
-
-### Advanced Collection with Grafana Loki
-
-For a production-grade, scalable log aggregation system, Sphere recommends using [Grafana Loki](https://grafana.com/oss/loki/). Loki is a horizontally scalable, multi-tenant log aggregation system inspired by Prometheus.
-
-You can set up a local Loki stack using Docker Compose:
+### Production Setup with Grafana Loki
+For production, use [Grafana Loki](https://grafana.com/oss/loki/) with Docker Compose:
 
 ```yaml
 version: "3.8"
-
 services:
   loki:
     image: grafana/loki:latest
     ports:
       - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
     
   promtail:
     image: grafana/promtail:latest
     volumes:
       - ./app.log:/var/log/app.log:ro
       - ./promtail-config.yml:/etc/promtail/config.yml
-    command: -config.file=/etc/promtail/config.yml
     depends_on:
       - loki
       
@@ -322,146 +289,40 @@ services:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
-    depends_on:
-      - loki
 ```
 
-### JSON Output for Structured Logging
+## Advanced Features
 
-For production environments, consider using JSON output format for better integration with log aggregation systems:
-
-```json
-{
-  "log": {
-    "level": "info",
-    "console": {
-      "disable": false,
-      "format": "json"
-    }
-  }
-}
-```
-
-This produces machine-readable logs:
-
-```json
-{
-  "level": "info",
-  "time": "2023-08-29T10:30:00Z",
-  "caller": "service/user.go:45",
-  "message": "User created successfully",
-  "userId": "123",
-  "email": "user@example.com"
-}
-```
-
-## Best Practices
-
-### Context Propagation
-Always include relevant context in your logs:
+### Initialization with Attributes
+Set global attributes for all logs:
 
 ```go
-func (s *Service) ProcessOrder(ctx context.Context, orderID string) error {
+func main() {
+    config := log.NewDefaultConfig()
+    config.Level = "debug"
     
-    logger.Info("Processing order", 
-        log.String("orderId", orderID),
-        log.String("userId", getUserIDFromContext(ctx))
-        log.String("traceId", getTraceIDFromContext(ctx))
-    )
-    // ... processing logic
+    attrs := map[string]any{
+        "service": "user-api",
+        "version": "1.0.0",
+        "environment": "production",
+    }
+    
+    log.Init(config, attrs)
+    defer log.Sync() // Flush logs before exit
+    
+    log.Info("Application started")
 }
 ```
 
-### Error Logging
-When logging errors, include the error and relevant context:
+### Logger Options
+Available options for customizing loggers:
 
 ```go
-if err != nil {
-    log.Error("Payment processing failed",
-        log.Err(err),
-        log.String("orderID", order.ID),
-        log.String("paymentMethod", order.PaymentMethod),
-        log.Float64("amount", order.Amount))
-    return err
-}
+logger := log.With(
+    log.WithName("component-name"),           // Set logger name
+    log.AddCaller(),                         // Include caller info
+    log.WithAttrs(map[string]any{            // Add attributes
+        "module": "auth",
+    }),
+)
 ```
-
-### Sensitive Data
-Never log sensitive information like passwords, API keys, or personal data:
-
-```go
-// Bad
-log.Info("User login", log.String("password", user.Password))
-
-// Good
-log.Info("User login attempt", 
-    log.String("email", user.Email),
-    log.Bool("success", loginSuccess))
-```
-
-### Performance Monitoring
-Use logs to track performance metrics:
-
-```go
-start := time.Now()
-defer func() {
-    log.Info("Operation completed",
-        log.String("operation", "processPayment"),
-        log.Duration("duration", time.Since(start)))
-}()
-```
-
-## Integration with Monitoring
-
-### Metrics from Logs
-You can extract metrics from structured logs using tools like Prometheus with log-based alerting:
-
-```go
-// Log metrics-friendly data
-log.Info("HTTP request completed",
-    log.String("method", "POST"),
-    log.String("endpoint", "/api/users"),
-    log.Int("status", 201),
-    log.Duration("duration", duration),
-    log.String("user_agent", userAgent))
-```
-
-### Alerting
-Set up alerts based on log patterns:
-
-```go
-// Log errors with severity levels
-log.Error("Database connection failed",
-    log.Err(err),
-    log.String("severity", "critical"),
-    log.String("component", "database"))
-```
-
-### Distributed Tracing
-Include trace IDs in logs for distributed tracing:
-
-```go
-traceID := getTraceIDFromContext(ctx)
-logger := log.With(log.String("traceID", traceID))
-
-logger.Info("Processing request")
-```
-
-## Troubleshooting
-
-### Common Issues
-
-**High CPU usage from logging**: Reduce log level in production or use asynchronous logging.
-
-**Disk space issues**: Ensure log rotation is configured properly.
-
-**Missing context**: Always use structured logging with relevant fields.
-
-### Debugging Tips
-
-1. **Use appropriate log levels** during development
-2. **Include request IDs** for tracing requests across services
-3. **Log entry and exit points** of important functions
-4. **Use structured fields** consistently for better searchability
-
-This logging approach provides observability into your Sphere applications while maintaining performance and enabling effective monitoring and debugging.
