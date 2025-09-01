@@ -1,6 +1,6 @@
 ---
 title: protoc-gen-sphere
-weight: 32
+weight: 33
 ---
 
 Generates HTTP server code from `.proto` service definitions, using `google.api.http` annotations and Sphere server utilities (Gin-based).

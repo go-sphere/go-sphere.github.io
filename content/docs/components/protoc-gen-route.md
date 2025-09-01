@@ -1,6 +1,6 @@
 ---
 title: protoc-gen-route
-weight: 33
+weight: 32
 ---
 
 `protoc-gen-route` is a protoc plugin that generates routing code from `.proto` files. It is designed to inspect service definitions within your protobuf files and automatically generate corresponding route handlers based on a specified template. This plugin creates Go code that provides structured routing with operation constants, extra data handling, server interfaces, and codec interfaces for seamless integration with various transport protocols.

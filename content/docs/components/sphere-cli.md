@@ -37,12 +37,13 @@ Initializes a new Sphere project with a default template.
 
 **Usage:**
 ```shell
-sphere-cli create --name <project-name> [--module <go-module-name>]
+sphere-cli create --name <project-name> [--module <go-module-name>] [--layout <template-uri>]
 ```
 
 **Flags:**
 - `--name string`: (Required) The name for the new Sphere project.
 - `--module string`: (Optional) The Go module path for the project.
+- `--layout string`: (Optional) Custom template layout URI.
 
 **Example:**
 ```shell
