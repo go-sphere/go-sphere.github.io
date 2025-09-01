@@ -1,0 +1,12 @@
+[
+    {
+        "name": "standard",
+        "path": "https://go-sphere.github.io/layout/standard.json",
+        "description": "A standard layout with full features."
+    },
+    {
+        "name": "simple",
+        "path": "https://go-sphere.github.io/layout/simple.json",
+        "description": "A simple layout with minimal features."
+    }
+]
