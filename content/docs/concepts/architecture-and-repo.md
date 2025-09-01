@@ -1,9 +1,6 @@
 ---
 title: Architecture & Repository Strategy
 weight: 25
-aliases:
-  - /docs/concepts/microservice-architecture/
-  - /docs/concepts/code-repository-types/
 ---
 
 Start monolith-first with clean boundaries, then split when needed. Use a single Go module with Makefile-driven code generation to keep contracts and runtime consistent.

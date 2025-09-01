@@ -65,7 +65,7 @@ func main() {
 To add structured context to your logs, you can use `log.With` to create a new logger instance with predefined fields.
 
 ```go
-logger := log.With(log.String("service", "UserService"), log.String("traceId", "xyz-123"))
+logger := log.With(log.WithAttrs(map[string]any{"module": "api"}))
 
 logger.Info("User lookup successful")
 // Output will include {"service": "UserService", "traceId": "xyz-123", "message": "User lookup successful"}
@@ -104,8 +104,10 @@ Use structured logging in your HTTP handlers to track requests:
 ```go
 func (s *UserService) CreateUser(c *gin.Context) {
     logger := log.With(
-        log.String("handler", "CreateUser"),
-        log.String("requestId", c.GetHeader("X-Request-ID")),
+        log.WithAttrs(map[string]any{
+            "service": "UserService",
+            "traceId": c.GetString("traceId"), // assuming traceId is set in context
+        })
     )
     
     logger.Info("Creating user request received")
@@ -140,7 +142,12 @@ Add contextual logging to your business logic:
 
 ```go
 func (b *UserBiz) CreateUser(ctx context.Context, req *CreateUserRequest) (*User, error) {
-    logger := log.With(log.String("method", "CreateUser"))
+    logger := log.With(
+        log.WithAttrs(map[string]any{
+            "module": "business",
+            "function": "CreateUser",
+        }),
+    )
     
     logger.Debug("Validating user input", log.String("email", req.Email))
     
@@ -355,12 +362,12 @@ Always include relevant context in your logs:
 
 ```go
 func (s *Service) ProcessOrder(ctx context.Context, orderID string) error {
-    logger := log.With(
-        log.String("orderID", orderID),
-        log.String("userID", getUserIDFromContext(ctx)),
-    )
     
-    logger.Info("Processing order")
+    logger.Info("Processing order", 
+        log.String("orderId", orderID),
+        log.String("userId", getUserIDFromContext(ctx))
+        log.String("traceId", getTraceIDFromContext(ctx))
+    )
     // ... processing logic
 }
 ```

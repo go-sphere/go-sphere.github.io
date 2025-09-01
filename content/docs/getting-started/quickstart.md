@@ -1,12 +1,6 @@
 ---
 title: Quick Start
 weight: 11
-aliases:
-  - /docs/start/getting-started/
-  - /docs/start/getting-started
-  - /docs/getting-started/quickstart
-  - /docs/getting-started/introduction
-  - /docs/getting-started/creating-your-first-project
 ---
 
 Sphere is a pragmatic Go backend toolkit centered on a clean monolithic template and a small toolchain that automates schema, API contracts, server stubs, Swagger, and even TypeScript clients.

@@ -1,9 +1,6 @@
 ---
 title: Project Structure
 weight: 21
-aliases:
-  - /docs/concepts/project-code-structure/
-  - /docs/concepts/project-layout/
 ---
 
 Sphere follows a pragmatic project structure that keeps code generation, server code, and business logic cleanly separated while staying fast to iterate on. The structure is based on the [sphere-layout](https://github.com/go-sphere/sphere-layout) template and follows Go community best practices.

@@ -1,8 +1,6 @@
 ---
 title: Getting Started
 weight: 10
-aliases:
-  - /docs/start/
 ---
 
 Kick off your first Sphere project.

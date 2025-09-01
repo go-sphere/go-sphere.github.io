@@ -1,9 +1,6 @@
 ---
 title: Protocol & Codegen
 weight: 23
-aliases:
-  - /docs/concepts/protobuf-protocol/
-  - /docs/concepts/code-generation-engine/
 ---
 
 Sphere follows a "protocol-first" approach where you define your APIs once in Protobuf and generate everything else from those definitions. This ensures consistency across your entire stack and reduces boilerplate code.

@@ -1,9 +1,6 @@
 ---
 title: Development Workflow
 weight: 12
-aliases:
-  - /docs/start/workflow/
-  - /docs/start/workflow
 ---
 
 A typical day-to-day development cycle with Sphere follows this pattern:
