@@ -394,8 +394,3 @@ service UserService {
 - Use with `protoc-gen-sphere` for HTTP routing
 - Combine with `protoc-gen-sphere-errors` for consistent error handling
 - Works with any transport layer that can use the generated interfaces
-
-## See Also
-
-- Concepts: ../../concepts/protocol-and-codegen
-- Component: ./protoc-gen-sphere

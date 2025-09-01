@@ -14,4 +14,3 @@ Explore Sphere's building blocks and repositories.
   {{< card link="protoc-gen-sphere-binding" title="protoc-gen-sphere-binding" icon="document-duplicate" >}}
   {{< card link="protoc-gen-sphere-errors" title="protoc-gen-sphere-errors" icon="variable" >}}
 {{< /cards >}}
-

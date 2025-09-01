@@ -34,18 +34,6 @@ Your `.proto` files serve as the authoritative definition of:
 - **HTTP mapping** (via annotations)
 - **Field constraints** (via validation rules)
 
-### Service Definitions
-
-Services declare operations and HTTP mappings via annotations. See ../guides/api-definitions for end‑to‑end examples.
-
-### Message Definitions
-
-Messages define the request/response contracts. Field binding is controlled with sphere/binding options; examples live in ../guides/api-definitions.
-
-### Error Definitions
-
-Define error enums with HTTP status/reason/message using sphere/errors. Usage and patterns are covered in ../guides/error-handling.
-
 ## Code Generation Pipeline
 
 ### Generator Chain
@@ -167,10 +155,3 @@ proto/
 2. **Appropriate status codes**: Use correct HTTP status codes
 3. **Clear messages**: Write user-friendly error messages
 4. **Structured data**: Include relevant context in errors
-
-## See Also
-
-- [API Definitions Guide](../guides/api-definitions) - Detailed HTTP mapping rules and examples
-- [Error Handling Guide](../guides/error-handling) - Comprehensive error patterns and implementation
-- [Components Overview](../components/) - Individual generator documentation and configuration
-- [Project Structure](project-structure) - How generated code fits into the overall project layout

@@ -233,9 +233,6 @@ message GetUserNameResponse {
 5. **Prefer explicit body field** (`body: "fieldName"`) when payloads are nested
 6. **Avoid `oneof`** in exposed HTTP request/response messages due to JSON codec limitations
 
-## Error Handling
-
-For consistent error handling across your APIs, see the [Error Handling Guide](error-handling).
 
 ## Integration with buf
 
@@ -264,7 +261,3 @@ plugins:
     opt:
       - paths=source_relative
 ```
-
-See Also
-- Components → Generators → protoc-gen-sphere for generating HTTP handlers
-- Components → Generators → protoc-gen-sphere-binding for tag injection

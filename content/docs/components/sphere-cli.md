@@ -174,9 +174,3 @@ If generated code seems out of sync:
 make clean    # Clean generated files
 make gen/all  # Regenerate everything
 ```
-
-## See Also
-
-- [Quick Start](../../getting-started/quickstart) - Complete project setup guide
-- [Project Structure](../../concepts/project-structure) - Understanding the generated project layout
-- [Components Overview](../) - Details about protoc plugins used by sphere-cli

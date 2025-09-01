@@ -83,6 +83,3 @@ make run
 - **Test early**: Use generated Swagger UI to verify endpoints
 - **Iterate fast**: Small changes → quick regeneration cycles
 - **Version APIs**: Use proto package versioning for breaking changes
-
-See [Quick Start](quickstart) for the complete setup process.
-

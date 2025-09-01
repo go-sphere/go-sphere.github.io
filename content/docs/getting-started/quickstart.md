@@ -172,11 +172,3 @@ make gen/dts
 3. **Business Logic**: Implement service methods in `internal/service/**`
 4. **Wire and Run**: `make gen/wire` → `make run`
 5. **Client SDKs**: `make gen/dts` for TypeScript clients
-
-## Next Steps
-
-- [Project Structure](../concepts/project-structure) - Understand the directory layout
-- [API Definitions](../guides/api-definitions) - Learn HTTP mapping and binding rules  
-- [Error Handling](../guides/error-handling) - Define typed, standardized errors
-- [Development Workflow](workflow) - Complete development process
-

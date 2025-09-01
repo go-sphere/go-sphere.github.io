@@ -48,12 +48,3 @@ Purpose
 Use when
 - You build adapters beyond HTTP or need custom routing hints
 
-See also
-- Component using options: ../components/protoc-gen-route
-
-## See Also
-
-- API Definitions Guide: ../guides/api-definitions
-- Error Handling Guide: ../guides/error-handling
-- Component: ../components/protoc-gen-route
-

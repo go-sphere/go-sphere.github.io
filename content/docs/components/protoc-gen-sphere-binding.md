@@ -277,9 +277,3 @@ func inspectTags() {
     }
 }
 ```
-
-## See Also
-
-- Guides: ../../guides/api-definitions
-- Component: ./protoc-gen-sphere
-- Concepts: ../../concepts/protocol-and-codegen

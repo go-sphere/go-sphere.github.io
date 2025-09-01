@@ -199,8 +199,3 @@ When used with Sphere's HTTP server utilities, these errors are automatically co
 - Sphere's Gin layer maps these to structured JSON with correct HTTP status
 - Pair with a global error parser if you need to merge validation/notfound/custom errors
 - The generated errors integrate seamlessly with Sphere's server utilities for consistent API responses
-
-## See Also
-
-- Guides: ../../guides/error-handling
-- Concepts: ../../concepts/protocol-and-codegen
