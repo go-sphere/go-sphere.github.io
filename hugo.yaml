@@ -1,13 +1,35 @@
-baseURL: https://go-sphere.github.io/
-languageCode: en-us
 title: Sphere
+baseURL: https://go-sphere.github.io/
+
+languageCode: en-us
 enableRobotsTXT: true
 enableGitInfo: true
 hasCJKLanguage: true
+enableInlineShortcodes: true
+
+outputs:
+  home: [html, llms]
+  page: [html]
+  section: [html, rss]
+
 module:
+  workspace: hugo.work
   imports:
     - path: github.com/imfing/hextra
-enableInlineShortcodes: true
+
+markup:
+  highlight:
+    noClasses: false
+  goldmark:
+    renderer:
+      unsafe: true
+    extensions:
+      passthrough:
+        delimiters:
+          block: [['\[', '\]'], ['$$', '$$']]
+          inline: [['\(', '\)']]
+        enable: true
+
 menu:
   main:
     - name: Documentation
@@ -81,15 +103,16 @@ menu:
       weight: 90
       params:
         icon: github
+
+
 params:
   externalLinkDecoration: true
-  banner:
-    key: 'announcement-v0_10'
   navbar:
     displayTitle: true
     displayLogo: true
     logo:
       path: images/sphere.png
+      dark: images/sphere.png
       width: 35
     width: wide
   theme:
@@ -127,19 +150,3 @@ params:
       display: hover
   page:
     width: normal
-markup:
-  goldmark:
-    renderer:
-      unsafe: true
-  asciidocExt:
-    attributes: {}
-    backend: html5
-    extensions: []
-    failureLevel: fatal
-    noHeaderOrFooter: true
-    preserveTOC: false
-    safeMode: unsafe
-    sectionNumbers: false
-    trace: false
-    verbose: false
-    workingFolderCurrent: false
