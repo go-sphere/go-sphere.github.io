@@ -19,7 +19,7 @@ layout: hextra-home
 
 <div class="hx:mb-12">
 {{< hextra/hero-subtitle >}}
-  Start monolithic, scale to microservices. Define once, generate everything with rapid tooling.
+  Start modular monolithic, scale to microservices. Define once, generate everything with rapid tooling.
 {{< /hextra/hero-subtitle >}}
 </div>
 

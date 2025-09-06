@@ -3,7 +3,7 @@ title: Quick Start
 weight: 11
 ---
 
-Sphere is a pragmatic Go backend toolkit centered on a clean monolithic template and a small toolchain that automates schema, API contracts, server stubs, Swagger, and even TypeScript clients.
+Sphere is a pragmatic Go backend toolkit centered on a clean modular monolithic template and a small toolchain that automates schema, API contracts, server stubs, Swagger, and even TypeScript clients.
 
 What you build:
 - Define entities with Ent and APIs with Protobuf  
