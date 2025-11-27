@@ -37,7 +37,7 @@ layout: hextra-home
   >}}
   {{< hextra/feature-card
     title="Pragmatic Monolith Template"
-    subtitle="Start simple with Gin + Wire + Ent in a single binary. Clean architecture that scales from MVP to microservices when needed."
+    subtitle="Start simple with `sphere layout` in a single binary. Clean architecture that scales from MVP to microservices when needed."
     link="docs/concepts/architecture-and-repo"
   >}}
   {{< hextra/feature-card

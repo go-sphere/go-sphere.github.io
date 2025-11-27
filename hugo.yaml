@@ -58,10 +58,17 @@ menu:
       params:
         type: link
         icon: terminal
+    - name: sphere-bun-layout ↗
+      parent: toolchains
+      url: https://github.com/go-sphere/sphere-bun-layout
+      weight: 13
+      params:
+        type: link
+        icon: terminal
     - name: sphere-simple-layout ↗
       parent: toolchains
       url: https://github.com/go-sphere/sphere-simple-layout
-      weight: 13
+      weight: 14
       params:
         type: link
         icon: terminal

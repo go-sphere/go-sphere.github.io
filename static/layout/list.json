@@ -8,5 +8,10 @@
         "name": "simple",
         "path": "https://go-sphere.github.io/layout/simple.json",
         "description": "A simple layout with minimal features."
+    },
+    {
+      "name": "bun",
+      "path": "https://go-sphere.github.io/layout/bun.json",
+      "description": "A simple layout with minimal features with bun integration."
     }
 ]
