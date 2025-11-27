@@ -37,38 +37,13 @@ menu:
     - name: Toolchains
       identifier: toolchains
       weight: 2
-    - name: sphere ↗
-      parent: toolchains
-      url: https://github.com/go-sphere/sphere
-      weight: 10
-      params:
-        type: link
-        icon: beaker
+    - name: Layout
+      identifier: layout
+      weight: 3
     - name: sphere-cli ↗
       parent: toolchains
       url: https://github.com/go-sphere/sphere-cli
       weight: 11
-      params:
-        type: link
-        icon: terminal
-    - name: sphere-layout ↗
-      parent: toolchains
-      url: https://github.com/go-sphere/sphere-layout
-      weight: 12
-      params:
-        type: link
-        icon: terminal
-    - name: sphere-bun-layout ↗
-      parent: toolchains
-      url: https://github.com/go-sphere/sphere-bun-layout
-      weight: 13
-      params:
-        type: link
-        icon: terminal
-    - name: sphere-simple-layout ↗
-      parent: toolchains
-      url: https://github.com/go-sphere/sphere-simple-layout
-      weight: 14
       params:
         type: link
         icon: terminal
@@ -97,6 +72,27 @@ menu:
       parent: toolchains
       url: https://github.com/go-sphere/protoc-gen-sphere-errors 
       weight: 23
+      params:
+        type: link
+        icon: terminal
+    - name: sphere-layout ↗
+      parent: layout
+      url: https://github.com/go-sphere/sphere-layout
+      weight: 32
+      params:
+        type: link
+        icon: terminal
+    - name: sphere-bun-layout ↗
+      parent: layout
+      url: https://github.com/go-sphere/sphere-bun-layout
+      weight: 33
+      params:
+        type: link
+        icon: terminal
+    - name: sphere-simple-layout ↗
+      parent: layout
+      url: https://github.com/go-sphere/sphere-simple-layout
+      weight: 34
       params:
         type: link
         icon: terminal
