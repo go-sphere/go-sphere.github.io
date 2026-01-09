@@ -1,10 +1,9 @@
 ---
-title: Components
+title: Components & Tools
 weight: 30
 ---
 
-Explore Sphere's building blocks and repositories.
-
+Explore Sphere's protoc plugins, CLI tools, and runtime libraries.
 <!--more-->
 
 {{< cards >}}

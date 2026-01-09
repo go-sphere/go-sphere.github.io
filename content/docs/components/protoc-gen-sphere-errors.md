@@ -3,9 +3,9 @@ title: protoc-gen-sphere-errors
 weight: 35
 ---
 
-`protoc-gen-sphere-errors` is a protoc plugin that generates error handling code from `.proto` files. It is designed to inspect enum definitions within your protobuf files and automatically generate corresponding error handling code based on the sphere errors framework. This plugin creates Go code that provides structured error handling with HTTP status codes, error codes, and customizable messages.
+[`protoc-gen-sphere-errors`](https://api.github.com/repos/go-sphere/protoc-gen-sphere-errors) is a protoc plugin that generates error handling code from `.proto` files. It is designed to inspect enum definitions within your protobuf files and automatically generate corresponding error handling code based on the sphere errors framework. This plugin creates Go code that provides structured error handling with HTTP status codes, error codes, and customizable messages.
 
-This code is inspired by [protoc-gen-go-errors](https://github.com/go-kratos/kratos/tree/main/cmd/protoc-gen-go-errors) but is specifically designed for the go-sphere framework.
+This code is inspired by [`protoc-gen-go-errors`](https://github.com/go-kratos/kratos/tree/main/cmd/protoc-gen-go-errors) but is specifically designed for the go-sphere framework.
 
 ## Features
 
@@ -18,7 +18,7 @@ This code is inspired by [protoc-gen-go-errors](https://github.com/go-kratos/kra
 
 ## Installation
 
-To install `protoc-gen-sphere-errors`, use the following command:
+To install [`protoc-gen-sphere-errors`](https://api.github.com/repos/go-sphere/protoc-gen-sphere-errors), use the following command:
 
 ```bash
 go install github.com/go-sphere/protoc-gen-sphere-errors@latest
@@ -35,7 +35,7 @@ deps:
 
 ## Usage with Buf
 
-To use `protoc-gen-sphere-errors` with `buf`, you can configure it in your `buf.gen.yaml` file. Here is an example configuration:
+To use [`protoc-gen-sphere-errors`](https://api.github.com/repos/go-sphere/protoc-gen-sphere-errors) with `buf`, you can configure it in your `buf.gen.yaml` file. Here is an example configuration:
 
 ```yaml
 version: v2

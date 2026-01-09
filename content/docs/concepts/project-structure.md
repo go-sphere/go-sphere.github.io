@@ -1,9 +1,21 @@
 ---
-title: Project Structure
+title: Project Structure & Architecture
 weight: 21
 ---
 
-Sphere follows a pragmatic project structure that keeps code generation, server code, and business logic cleanly separated while staying fast to iterate on. The structure is based on the [sphere-layout](https://github.com/go-sphere/sphere-layout) template and follows Go community best practices.
+Sphere follows a pragmatic project structure that keeps code generation, server code, and business logic cleanly separated while staying fast to iterate on. The structure is based on the [`sphere-layout`](https://api.github.com/repos/go-sphere/sphere-layout) template and follows Go community best practices.
+
+## Architecture Philosophy
+
+Sphere embraces a **monolith-first approach** with clean boundaries:
+
+- **Start with one binary** using the standard project structure
+- **Share contracts via Protobuf** and generated code across services
+- **Extract services only when scaling** requires it
+- **Maintain clear boundaries** via directories and interfaces
+- **Automate with Makefile** targets to maintain repeatability
+
+This approach allows you to begin with a modular monolith and easily scale to microservices without restructuring your codebase.
 
 ## Overview
 
@@ -92,3 +104,29 @@ If you're migrating from other project layouts:
 4. **From Hexagonal Architecture**: Map ports/adapters to service/biz layers
 
 The key is maintaining clear boundaries between transport, business logic, and data access while leveraging code generation for the transport layer.
+## Scaling Out
+
+As your application grows, Sphere enables seamless scaling:
+
+- **Multiple binaries** can reuse the same contracts and tooling
+- **Consistent errors, routing, and payloads** via generators reduce drift between services
+- **Shared proto packages** keep all services in sync
+- **Makefile targets** ensure consistent build and generation processes across all services
+
+## Repository Strategy
+
+Sphere recommends a pragmatic approach to repository organization:
+
+### Single Repository Approach (Recommended for Start)
+- Keep everything in one repository initially
+- Use Makefile-driven code generation for consistency
+- Maintain clear module boundaries through interfaces
+- Scale to multiple repositories only when necessary
+
+### Multi-Repository Strategy (When Scaling)
+- Separate repositories for independent microservices
+- Shared proto definitions in a dedicated repository
+- Shared libraries in separate packages
+- Consistent tooling across all repositories
+
+The key is starting simple with a single monolithic structure and evolving to microservices only when business requirements demand it. The shared Protobuf contracts and generators ensure consistency across the entire system.

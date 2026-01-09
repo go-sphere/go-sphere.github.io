@@ -5,11 +5,11 @@ weight: 42
 
 Sphere provides a powerful mechanism for generating typed, consistent error-handling code directly from your `.proto` definitions. By defining your errors as enums, you can ensure that error codes, HTTP statuses, and messages are standardized across your application.
 
-This process is handled by `protoc-gen-sphere-errors`, a `protoc` plugin that inspects your `.proto` files and generates Go error-handling code.
+This process is handled by [`protoc-gen-sphere-errors`](https://api.github.com/repos/go-sphere/protoc-gen-sphere-errors), a `protoc` plugin that inspects your `.proto` files and generates Go error-handling code.
 
 ## Installation
 
-To install `protoc-gen-sphere-errors`, use the following command:
+To install [`protoc-gen-sphere-errors`](https://api.github.com/repos/go-sphere/protoc-gen-sphere-errors), use the following command:
 
 ```bash
 go install github.com/go-sphere/protoc-gen-sphere-errors@latest

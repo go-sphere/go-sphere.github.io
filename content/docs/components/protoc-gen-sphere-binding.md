@@ -3,7 +3,7 @@ title: protoc-gen-sphere-binding
 weight: 34
 ---
 
-`protoc-gen-sphere-binding` is a protoc plugin that generates Go struct tags for Sphere binding from `.proto` files. It is designed to inspect service definitions within your protobuf files and automatically generate corresponding Go struct tags based on sphere binding annotations.
+[`protoc-gen-sphere-binding`](https://api.github.com/repos/go-sphere/protoc-gen-sphere-binding) is a protoc plugin that generates Go struct tags for Sphere binding from `.proto` files. It is designed to inspect service definitions within your protobuf files and automatically generate corresponding Go struct tags based on sphere binding annotations.
 
 Unlike other protoc plugins that generate new files, this plugin modifies the generated Go structs by injecting appropriate tags for request binding in HTTP handlers.
 
@@ -26,14 +26,16 @@ deps:
 
 ## Configuration Parameters
 
-The behavior of `protoc-gen-sphere-binding` can be customized with the following parameters:
+The behavior of [`protoc-gen-sphere-binding`](https://api.github.com/repos/go-sphere/protoc-gen-sphere-binding) can be customized with the following parameters:
 
 - **`version`**: Print the current plugin version and exit. (Default: `false`)
-- **`out`**: The output directory for the modified `.proto` files. (Default: `api`)
+- **`out`**: The output directory for the modified `.pb.go` files. (Default: `api`)
+- **`auto_remove_json`**: Automatically remove json tag when sphere binding location is set. (Default: `true`)
+- **`binding_aliases`**: Add additional tag aliases for any binding tag. Format: `tag1=alias1,tag2=alias2`. Example: `query=form,uri=path,db=database`. (Default: `""`)
 
 ## Usage with Buf
 
-To use `protoc-gen-sphere-binding` with `buf`, you can configure it in your `buf.gen.yaml` file. **Note**: `protoc-gen-sphere-binding` cannot be used with the standard `buf.gen.yaml` because it does not generate Go code, but rather modifies the `.proto` files to include Sphere binding tags.
+To use [`protoc-gen-sphere-binding`](https://api.github.com/repos/go-sphere/protoc-gen-sphere-binding) with `buf`, you can configure it in your `buf.gen.yaml` file. **Note**: [`protoc-gen-sphere-binding`](https://api.github.com/repos/go-sphere/protoc-gen-sphere-binding) cannot be used with the standard `buf.gen.yaml` because it does not generate Go code, but rather modifies the `.proto` files to include Sphere binding tags.
 
 Here is an example configuration:
 
@@ -64,10 +66,10 @@ plugins:
 The plugin supports the following binding locations through the `sphere.binding.location` annotation:
 
 - `BINDING_LOCATION_BODY`: Fields bound to JSON request body (default behavior)
-- `BINDING_LOCATION_QUERY`: Fields bound to query parameters (adds `form` tag)
+- `BINDING_LOCATION_QUERY`: Fields bound to query parameters (adds `query` tag, removes `json` tag)
 - `BINDING_LOCATION_URI`: Fields bound to URI path parameters (adds `uri` tag, removes `json` tag)
-- `BINDING_LOCATION_HEADER`: Fields bound to HTTP headers (adds `header` tag)
-- `BINDING_LOCATION_FORM`: Fields bound to form data (adds `form` tag)
+- `BINDING_LOCATION_HEADER`: Fields bound to HTTP headers (adds `header` tag, removes `json` tag)
+- `BINDING_LOCATION_FORM`: Fields bound to form data (adds `form` tag, removes `json` tag)
 
 ## Proto Definition Example
 
@@ -137,9 +139,9 @@ type RunTestRequest struct {
 
     PathTest1  string  `protobuf:"bytes,1,opt,name=path_test1,json=pathTest1,proto3" json:"-" uri:"path_test1"`
     FieldTest1 string  `protobuf:"bytes,2,opt,name=field_test1,json=fieldTest1,proto3" json:"field_test1"`
-    QueryTest1 string  `protobuf:"bytes,3,opt,name=query_test1,json=queryTest1,proto3" json:"-" form:"query_test1"`
+    QueryTest1 string  `protobuf:"bytes,3,opt,name=query_test1,json=queryTest1,proto3" json:"-" query:"query_test1"`
     AuthToken  string  `protobuf:"bytes,8,opt,name=auth_token,json=authToken,proto3" json:"-" header:"auth_token"`
-    Ids        []int32 `protobuf:"varint,9,rep,packed,name=ids,proto3" json:"-" form:"ids" custom:"ids"`
+    Ids        []int32 `protobuf:"varint,9,rep,packed,name=ids,proto3" json:"-" query:"ids" custom:"ids"`
 }
 
 type BodyPathTestRequest_Request struct {
@@ -161,11 +163,11 @@ You can set default binding behavior for entire messages:
 ```protobuf
 message SearchRequest {
   option (sphere.binding.default_location) = BINDING_LOCATION_QUERY;
-  option (sphere.binding.default_auto_tags) = "form";
+  option (sphere.binding.default_auto_tags) = "validate";
   
-  string name = 1;        // Will be bound from query with form tag
-  int32 age = 2;          // Will be bound from query with form tag
-  string email = 3;       // Will be bound from query with form tag
+  string name = 1;        // Will be bound from query with validate tag
+  int32 age = 2;          // Will be bound from query with validate tag
+  string email = 3;       // Will be bound from query with validate tag
 }
 ```
 
@@ -177,7 +179,7 @@ The plugin also supports oneof fields with default configurations:
 message TestRequest {
   oneof test_oneof {
     option (sphere.binding.default_oneof_location) = BINDING_LOCATION_QUERY;
-    option (sphere.binding.default_oneof_auto_tags) = "form";
+    option (sphere.binding.default_oneof_auto_tags) = "validate";
     
     string option_a = 1;
     string option_b = 2;

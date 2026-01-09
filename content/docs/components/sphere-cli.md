@@ -3,7 +3,7 @@ title: sphere-cli
 weight: 31
 ---
 
-Sphere CLI (`sphere-cli`) is a command-line tool designed to streamline the development of [Sphere](https://github.com/go-sphere/sphere) projects. It helps you create new projects, generate service code, manage Protobuf definitions, and perform other common development tasks.
+Sphere CLI (`sphere-cli`) is a command-line tool designed to streamline the development of [`sphere`](https://api.github.com/repos/go-sphere/sphere) projects. It helps you create new projects, generate service code, manage Protobuf definitions, and perform other common development tasks.
 
 ## Installation
 
@@ -50,7 +50,7 @@ sphere-cli create --name <project-name> [--module <go-module-name>] [--layout <t
 sphere-cli create --name myproject --module github.com/myorg/myproject
 ```
 
-This command creates a new project directory with the [sphere-layout](https://github.com/go-sphere/sphere-layout) template, including:
+This command creates a new project directory with the [`sphere-layout`](https://api.github.com/repos/go-sphere/sphere-layout) template, including:
 - Makefile for build automation
 - buf configuration for protobuf management
 - Standard directory structure

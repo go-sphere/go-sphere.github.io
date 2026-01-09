@@ -8,9 +8,7 @@ Understand Sphere's architecture, protocols, and design choices.
 <!--more-->
 
 {{< cards >}}
-  {{< card link="project-structure" title="Project Structure" icon="template" >}}
+  {{< card link="project-structure" title="Project Structure & Architecture" icon="template" >}}
   {{< card link="protocol-and-codegen" title="Protocol & Codegen" icon="sparkles" >}}
-  {{< card link="proto-packages" title="Proto Packages" icon="code" >}}
-  {{< card link="runtime" title="Runtime" icon="adjustments" >}}
-  {{< card link="architecture-and-repo" title="Architecture & Repository" icon="server" >}}
+  {{< card link="proto-packages-and-runtime" title="Proto Packages & Runtime" icon="adjustments" >}}
 {{< /cards >}}

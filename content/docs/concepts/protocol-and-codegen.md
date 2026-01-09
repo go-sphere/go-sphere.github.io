@@ -1,5 +1,5 @@
 ---
-title: Protocol & Codegen
+title: Protocol & Code Generation
 weight: 23
 ---
 
@@ -25,8 +25,6 @@ This approach provides:
 
 ## Protocol as Contract
 
-### Single Source of Truth
-
 Your `.proto` files serve as the authoritative definition of:
 - **Data structures** (messages)
 - **API operations** (services and methods)
@@ -41,32 +39,32 @@ Your `.proto` files serve as the authoritative definition of:
 The code generation happens in a specific order:
 
 1. **protoc-gen-go**: Generate base Go types
-2. **protoc-gen-sphere-binding**: Add struct tags for binding
-3. **protoc-gen-sphere**: Generate HTTP handlers and routing
-4. **protoc-gen-sphere-errors**: Generate error types and handling
-5. **protoc-gen-route**: Generate custom routing (optional)
+2. **[protoc-gen-sphere-binding](https://api.github.com/repos/go-sphere/protoc-gen-sphere-binding)**: Add struct tags for binding
+3. **[protoc-gen-sphere](https://api.github.com/repos/go-sphere/protoc-gen-sphere)**: Generate HTTP handlers and routing
+4. **[protoc-gen-sphere-errors](https://api.github.com/repos/go-sphere/protoc-gen-sphere-errors)**: Generate error types and handling
+5. **[protoc-gen-route](https://api.github.com/repos/go-sphere/protoc-gen-route)**: Generate custom routing (optional)
 
 ### What Gets Generated
 
 From your proto definitions, you automatically get:
 
-#### Server-side Code
-- **Service interfaces** to implement
-- **HTTP handlers** with proper routing
-- **Request binding** with validation
-- **Response marshaling** with proper headers
-- **Error handling** with consistent formatting
+**Server-side Code:**
+- Service interfaces to implement
+- HTTP handlers with proper routing
+- Request binding with validation
+- Response marshaling with proper headers
+- Error handling with consistent formatting
 
-#### Client-side Code
-- **OpenAPI/Swagger documentation**
-- **TypeScript SDKs** (optional)
-- **Go client stubs** (if needed)
-- **Validation schemas** for frontend use
+**Client-side Code:**
+- OpenAPI/Swagger documentation
+- TypeScript SDKs (optional)
+- Go client stubs (if needed)
+- Validation schemas for frontend use
 
-#### Developer Tools
-- **Interactive documentation** via Swagger UI
-- **API testing** endpoints
-- **Type definitions** for IDE support
+**Developer Tools:**
+- Interactive documentation via Swagger UI
+- API testing endpoints
+- Type definitions for IDE support
 
 ## Benefits of This Approach
 
@@ -116,26 +114,6 @@ proto/
 - Plan for backwards compatibility
 - Document breaking changes clearly
 
-## Evolution and Maintenance
-
-### Adding New Features
-1. Define new messages/services in `.proto`
-2. Run code generation
-3. Implement service methods
-4. Tests and documentation are automatically updated
-
-### API Versioning
-- Create new version packages for breaking changes
-- Maintain multiple versions simultaneously
-- Gradual migration paths for clients
-- Automatic deprecation warnings
-
-### Team Collaboration
-- Proto files as API contracts between teams
-- Code review focuses on API design
-- Generated code handles implementation details
-- Consistent patterns across all services
-
 ## Best Practices
 
 ### Proto Design
@@ -150,8 +128,9 @@ proto/
 3. **Version control**: Commit both `.proto` and generated files
 4. **Automation**: Integrate generation into build process
 
-### Error Handling
-1. **Comprehensive coverage**: Define errors for all failure modes
-2. **Appropriate status codes**: Use correct HTTP status codes
-3. **Clear messages**: Write user-friendly error messages
-4. **Structured data**: Include relevant context in errors
+## Related Guides
+
+For detailed information on:
+- **Defining HTTP APIs**: See [API Definitions](../guides/api-definitions)
+- **Error handling**: See [Error Handling](../guides/error-handling)
+- **Proto packages**: See [Proto Packages & Runtime](proto-packages-and-runtime)
