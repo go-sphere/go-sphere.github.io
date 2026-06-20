@@ -3,7 +3,7 @@ title: protoc-gen-route
 weight: 32
 ---
 
-[`protoc-gen-route`](https://api.github.com/repos/go-sphere/protoc-gen-route) is a protoc plugin that generates routing code from `.proto` files. It is designed to inspect service definitions within your protobuf files and automatically generate corresponding route handlers based on a specified template. This plugin creates Go code that provides structured routing with operation constants, extra data handling, server interfaces, and codec interfaces for seamless integration with various transport protocols.
+[`protoc-gen-route`](https://github.com/go-sphere/protoc-gen-route) is a protoc plugin that generates routing code from `.proto` files. It is designed to inspect service definitions within your protobuf files and automatically generate corresponding route handlers based on a specified template. This plugin creates Go code that provides structured routing with operation constants, extra data handling, server interfaces, and codec interfaces for seamless integration with various transport protocols.
 
 ## Features
 
@@ -86,25 +86,21 @@ import "sphere/options/options.proto";
 service MenuService {
   // UpdateCount handles count update operations
   rpc UpdateCount(UpdateCountRequest) returns (UpdateCountResponse) {
-    option (sphere.options.options) = [
-      {
-        key: "callback_query"
-        text: "start"
-      },
-      {
-        key: "command"
-        text: "start"
-      }
-    ];
+    option (sphere.options.options) = {
+      key: "callback_query"
+      text: "start"
+    };
+    option (sphere.options.options) = {
+      key: "command"
+      text: "start"
+    };
   }
   
   rpc ProcessMenu(ProcessMenuRequest) returns (ProcessMenuResponse) {
-    option (sphere.options.options) = [
-      {
-        key: "callback_query"
-        text: "menu_.*"
-      }
-    ];
+    option (sphere.options.options) = {
+      key: "callback_query"
+      text: "menu_.*"
+    };
   }
 }
 
@@ -233,16 +229,14 @@ The plugin is commonly used for routing bot commands in messaging platforms:
 ```protobuf
 service BotService {
   rpc Start(StartRequest) returns (StartResponse) {
-    option (sphere.options.options) = [
-      {
-        key: "command"
-        text: "/start"
-      },
-      {
-        key: "callback_query"
-        text: "start_.*"
-      }
-    ];
+    option (sphere.options.options) = {
+      key: "command"
+      text: "/start"
+    };
+    option (sphere.options.options) = {
+      key: "callback_query"
+      text: "start_.*"
+    };
   }
 }
 ```
@@ -254,12 +248,10 @@ You can also use it for general event routing:
 ```protobuf
 service EventService {
   rpc HandleUserCreated(UserCreatedRequest) returns (UserCreatedResponse) {
-    option (sphere.options.options) = [
-      {
-        key: "event_type"
-        text: "user.created"
-      }
-    ];
+    option (sphere.options.options) = {
+      key: "event_type"
+      text: "user.created"
+    };
   }
 }
 ```
@@ -353,20 +345,18 @@ You can generate routing code for different transport protocols by using differe
 ```protobuf
 service UserService {
   rpc GetUser(GetUserRequest) returns (GetUserResponse) {
-    option (sphere.options.options) = [
-      {
-        key: "http"
-        text: "GET /users/{id}"
-      },
-      {
-        key: "bot"
-        text: "user_info"
-      },
-      {
-        key: "event"
-        text: "user.get"
-      }
-    ];
+    option (sphere.options.options) = {
+      key: "http"
+      text: "GET /users/{id}"
+    };
+    option (sphere.options.options) = {
+      key: "bot"
+      text: "user_info"
+    };
+    option (sphere.options.options) = {
+      key: "event"
+      text: "user.get"
+    };
   }
 }
 ```

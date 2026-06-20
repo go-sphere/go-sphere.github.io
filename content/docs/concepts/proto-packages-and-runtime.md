@@ -88,7 +88,7 @@ Sphere's HTTP runtime layer builds on Gin with small, focused helpers that keep 
 
 ### Typical Request Flow
 
-1. **Protobuf + [`protoc-gen-sphere`](https://api.github.com/repos/go-sphere/protoc-gen-sphere)** generate handler plumbing
+1. **Protobuf + [`protoc-gen-sphere`](https://github.com/go-sphere/protoc-gen-sphere)** generate handler plumbing
 2. **Request arrives** at generated HTTP handler
 3. **Handler binds** request data to generated structs (using sphere/binding)
 4. **Service method** executes business logic, returns data or typed error
@@ -118,7 +118,7 @@ func (s *UserHandler) GetUser(ctx *gin.Context) {
 
 ### Extensibility
 
-- **Custom Router Types**: Swap Gin for Fiber, Echo, or Hertz via [`protoc-gen-sphere`](https://api.github.com/repos/go-sphere/protoc-gen-sphere) flags
+- **Custom Router Types**: Swap Gin for Fiber, Echo, or Hertz via [`protoc-gen-sphere`](https://github.com/go-sphere/protoc-gen-sphere) flags
 - **Context Customization**: Use custom context types instead of `*gin.Context`
 - **Response Envelope**: Define your own data/error response structures
 - **Error Parser**: Provide custom error handling to merge validation or domain-specific errors

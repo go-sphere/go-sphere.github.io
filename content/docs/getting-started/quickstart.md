@@ -41,7 +41,7 @@ sphere-cli create --name myproject --mod github.com/yourusername/myproject
 cd myproject
 ```
 
-This generates a new project with a clean structure based on [`sphere-layout`](https://api.github.com/repos/go-sphere/sphere-layout) and automatically installs all required protoc plugins and dependencies.
+This generates a new project with a clean structure based on [`sphere-layout`](https://github.com/go-sphere/sphere-layout) and automatically installs all required protoc plugins and dependencies.
 
 ### 2. Define Database Schema (Ent)
 

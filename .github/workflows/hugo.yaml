@@ -41,6 +41,10 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
+      - name: Install Protobuf compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
       - name: Create directory for user-specific executable files
         run: |
           mkdir -p "${HOME}/.local"
@@ -63,6 +67,7 @@ jobs:
           echo "Go: $(go version)"
           echo "Hugo: $(hugo version)"
           echo "Node.js: $(node --version)"
+          echo "protoc: $(protoc --version)"
       - name: Install Node.js dependencies
         run: |
           [[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true
@@ -77,6 +82,9 @@ jobs:
           key: hugo-${{ github.run_id }}
           restore-keys:
             hugo-
+      - name: Test docs
+        run: |
+          go test ./...
       - name: Build the site
         run: |
           hugo \

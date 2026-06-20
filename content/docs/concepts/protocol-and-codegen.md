@@ -39,10 +39,10 @@ Your `.proto` files serve as the authoritative definition of:
 The code generation happens in a specific order:
 
 1. **protoc-gen-go**: Generate base Go types
-2. **[protoc-gen-sphere-binding](https://api.github.com/repos/go-sphere/protoc-gen-sphere-binding)**: Add struct tags for binding
-3. **[protoc-gen-sphere](https://api.github.com/repos/go-sphere/protoc-gen-sphere)**: Generate HTTP handlers and routing
-4. **[protoc-gen-sphere-errors](https://api.github.com/repos/go-sphere/protoc-gen-sphere-errors)**: Generate error types and handling
-5. **[protoc-gen-route](https://api.github.com/repos/go-sphere/protoc-gen-route)**: Generate custom routing (optional)
+2. **[protoc-gen-sphere-binding](https://github.com/go-sphere/protoc-gen-sphere-binding)**: Add struct tags for binding
+3. **[protoc-gen-sphere](https://github.com/go-sphere/protoc-gen-sphere)**: Generate HTTP handlers and routing
+4. **[protoc-gen-sphere-errors](https://github.com/go-sphere/protoc-gen-sphere-errors)**: Generate error types and handling
+5. **[protoc-gen-route](https://github.com/go-sphere/protoc-gen-route)**: Generate custom routing (optional)
 
 ### What Gets Generated
 

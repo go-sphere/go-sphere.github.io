@@ -121,7 +121,7 @@ message UpdateUserRequest {
 Available binding locations:
 - `BINDING_LOCATION_URI`: Path parameters
 - `BINDING_LOCATION_QUERY`: Query string parameters
-- `BINDING_LOCATION_BODY`: JSON request body (default for non-GET methods)
+- `BINDING_LOCATION_JSON`: JSON request body (default for non-GET methods)
 - `BINDING_LOCATION_HEADER`: HTTP headers
 - `BINDING_LOCATION_FORM`: Form data
 
@@ -221,7 +221,7 @@ message GetUserNameResponse {
 2. **Choose appropriate binding locations**:
    - `BINDING_LOCATION_URI`: For resource identifiers in the path
    - `BINDING_LOCATION_QUERY`: For optional filters and pagination
-   - `BINDING_LOCATION_BODY`: For complex data structures and create/update operations
+   - `BINDING_LOCATION_JSON`: For complex data structures and create/update operations
 3. **Be consistent with HTTP method semantics**:
    - GET: Retrieve data (no body, use query params for filters)
    - POST: Create new resources (use body for data)

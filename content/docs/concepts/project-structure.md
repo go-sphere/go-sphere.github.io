@@ -3,7 +3,7 @@ title: Project Structure & Architecture
 weight: 21
 ---
 
-Sphere follows a pragmatic project structure that keeps code generation, server code, and business logic cleanly separated while staying fast to iterate on. The structure is based on the [`sphere-layout`](https://api.github.com/repos/go-sphere/sphere-layout) template and follows Go community best practices.
+Sphere follows a pragmatic project structure that keeps code generation, server code, and business logic cleanly separated while staying fast to iterate on. The structure is based on the [`sphere-layout`](https://github.com/go-sphere/sphere-layout) template and follows Go community best practices.
 
 ## Architecture Philosophy
 

@@ -3,7 +3,7 @@ title: protoc-gen-sphere-binding
 weight: 34
 ---
 
-[`protoc-gen-sphere-binding`](https://api.github.com/repos/go-sphere/protoc-gen-sphere-binding) is a protoc plugin that generates Go struct tags for Sphere binding from `.proto` files. It is designed to inspect service definitions within your protobuf files and automatically generate corresponding Go struct tags based on sphere binding annotations.
+[`protoc-gen-sphere-binding`](https://github.com/go-sphere/protoc-gen-sphere-binding) is a protoc plugin that generates Go struct tags for Sphere binding from `.proto` files. It is designed to inspect service definitions within your protobuf files and automatically generate corresponding Go struct tags based on sphere binding annotations.
 
 Unlike other protoc plugins that generate new files, this plugin modifies the generated Go structs by injecting appropriate tags for request binding in HTTP handlers.
 
@@ -26,7 +26,7 @@ deps:
 
 ## Configuration Parameters
 
-The behavior of [`protoc-gen-sphere-binding`](https://api.github.com/repos/go-sphere/protoc-gen-sphere-binding) can be customized with the following parameters:
+The behavior of [`protoc-gen-sphere-binding`](https://github.com/go-sphere/protoc-gen-sphere-binding) can be customized with the following parameters:
 
 - **`version`**: Print the current plugin version and exit. (Default: `false`)
 - **`out`**: The output directory for the modified `.pb.go` files. (Default: `api`)
@@ -35,7 +35,7 @@ The behavior of [`protoc-gen-sphere-binding`](https://api.github.com/repos/go-sp
 
 ## Usage with Buf
 
-To use [`protoc-gen-sphere-binding`](https://api.github.com/repos/go-sphere/protoc-gen-sphere-binding) with `buf`, you can configure it in your `buf.gen.yaml` file. **Note**: [`protoc-gen-sphere-binding`](https://api.github.com/repos/go-sphere/protoc-gen-sphere-binding) cannot be used with the standard `buf.gen.yaml` because it does not generate Go code, but rather modifies the `.proto` files to include Sphere binding tags.
+To use [`protoc-gen-sphere-binding`](https://github.com/go-sphere/protoc-gen-sphere-binding) with `buf`, you can configure it in your `buf.gen.yaml` file. **Note**: [`protoc-gen-sphere-binding`](https://github.com/go-sphere/protoc-gen-sphere-binding) cannot be used with the standard `buf.gen.yaml` because it does not generate Go code, but rather modifies the `.proto` files to include Sphere binding tags.
 
 Here is an example configuration:
 
@@ -65,7 +65,7 @@ plugins:
 
 The plugin supports the following binding locations through the `sphere.binding.location` annotation:
 
-- `BINDING_LOCATION_BODY`: Fields bound to JSON request body (default behavior)
+- `BINDING_LOCATION_JSON`: Fields bound to JSON request body (default behavior)
 - `BINDING_LOCATION_QUERY`: Fields bound to query parameters (adds `query` tag, removes `json` tag)
 - `BINDING_LOCATION_URI`: Fields bound to URI path parameters (adds `uri` tag, removes `json` tag)
 - `BINDING_LOCATION_HEADER`: Fields bound to HTTP headers (adds `header` tag, removes `json` tag)
@@ -107,6 +107,10 @@ message RunTestRequest {
     (sphere.binding.location) = BINDING_LOCATION_QUERY,
     (sphere.binding.auto_tags) = "custom:\"ids\""
   ];
+}
+
+message RunTestResponse {
+  string message = 1;
 }
 
 // Message with default auto tags

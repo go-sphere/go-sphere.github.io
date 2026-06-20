@@ -44,4 +44,4 @@ plugins:
 
 Notes
 - Works hand-in-hand with Sphere’s Gin helpers: `WithJson`, `ShouldBindJSON`, `ShouldBindUri`, `ShouldBindQuery`
-- Pair with [`protoc-gen-sphere-binding`](https://api.github.com/repos/go-sphere/protoc-gen-sphere-binding) to inject binding tags into generated structs
+- Pair with [`protoc-gen-sphere-binding`](https://github.com/go-sphere/protoc-gen-sphere-binding) to inject binding tags into generated structs
