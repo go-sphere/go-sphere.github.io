@@ -12,14 +12,14 @@ layout: hextra-home
 
 <div class="hx:mt-6 hx:mb-6">
 {{< hextra/hero-headline >}}
-  Protobuf-first Go service framework&nbsp;
+  Thin integration layer&nbsp;
   <br class="hx:sm:block hx:hidden" />for definition-driven development
 {{< /hextra/hero-headline >}}
 </div>
 
 <div class="hx:mb-12">
 {{< hextra/hero-subtitle >}}
-  Start modular monolithic, scale to microservices. Define once, generate everything with rapid tooling.
+  Compose mature Go tools with Protobuf contracts, small adapters, code generators, templates, and Makefile-driven workflows.
 {{< /hextra/hero-subtitle >}}
 </div>
 
@@ -32,17 +32,22 @@ layout: hextra-home
 {{< hextra/feature-grid>}}
   {{< hextra/feature-card
     title="Protocol-First Design"
-    subtitle="Define once in Protobuf, generate everywhere. Get Go handlers, HTTP routing, client SDKs, and OpenAPI docs from a single source of truth."
+    subtitle="Use Protobuf as the service contract. Generate transport glue, binding metadata, typed errors, and documentation from the same source."
     link="docs/concepts/protocol-and-codegen"
   >}}
   {{< hextra/feature-card
-    title="Pragmatic Monolith Template"
-    subtitle="Start simple with `sphere layout` in a single binary. Clean architecture that scales from MVP to microservices when needed."
-    link="docs/concepts/architecture-and-repo"
+    title="Replaceable Defaults"
+    subtitle="Official templates pick Gin, Ent or Bun, Wire, Buf, and Swagger, but those choices remain visible and replaceable."
+    link="docs/concepts/philosophy"
   >}}
   {{< hextra/feature-card
-    title="Complete Code Generation"
-    subtitle="Automated toolchain with protoc-gen-sphere ecosystem: server stubs, HTTP routing, field binding, typed errors, and validation."
+    title="Makefile Workflow"
+    subtitle="The CLI creates a project; the generated Makefile owns init, generation, formatting, linting, running, and builds."
+    link="docs/concepts/makefile-contract"
+  >}}
+  {{< hextra/feature-card
+    title="Focused Code Generation"
+    subtitle="The protoc-gen-sphere ecosystem creates repeatable plumbing while business logic stays in ordinary Go packages."
     link="docs/components"
   >}}
   {{< hextra/feature-card
@@ -51,14 +56,9 @@ layout: hextra-home
     link="docs/guides/error-handling"
   >}}
   {{< hextra/feature-card
-    title="Full-Stack Development"
-    subtitle="Generate Swagger documentation, TypeScript SDKs, and validation schemas. Bridge backend and frontend with type safety."
-    link="docs/guides/api-definitions"
-  >}}
-  {{< hextra/feature-card
-    title="Developer Experience"
-    subtitle="sphere-cli for project scaffolding, Makefile workflows, and clean project structure. Focus on business logic, not boilerplate."
-    link="docs/components/sphere-cli"
+    title="Customizable Stack"
+    subtitle="Swap routers, persistence, dependency injection, documentation, or deployment flow while keeping the same project contracts."
+    link="docs/guides/customizing-stack"
   >}}
 {{< /hextra/feature-grid >}}
 </div>

@@ -3,7 +3,9 @@ title: sphere-cli
 weight: 31
 ---
 
-Sphere CLI (`sphere-cli`) is a command-line tool designed to streamline the development of [`sphere`](https://github.com/go-sphere/sphere) projects. It helps you create new projects, generate service code, manage Protobuf definitions, and perform other common development tasks.
+Sphere CLI (`sphere-cli`) is a small bootstrap tool for [`sphere`](https://github.com/go-sphere/sphere) projects. It creates projects from templates, lists available templates, renames module paths, and provides lightweight service skeleton helpers.
+
+It is intentionally not the primary build, deploy, or runtime orchestration tool. After a project is created, the generated Makefile, Buf, Go, Wire, Swag, Docker, and project-local tools own the day-to-day workflow.
 
 ## Installation
 
@@ -31,6 +33,23 @@ sphere-cli [command] --help
 
 Here is an overview of the available commands.
 
+## Scope
+
+`sphere-cli` is responsible for:
+
+- creating projects from official or custom templates;
+- listing available templates;
+- renaming Go module paths;
+- generating small service skeletons when useful.
+
+`sphere-cli` is not responsible for:
+
+- building binaries;
+- running test and lint workflows;
+- generating every project artifact;
+- managing Docker or Kubernetes deployment;
+- replacing `make`, `buf`, `go`, `wire`, `swag`, or Docker.
+
 ### `create`
 
 Initializes a new Sphere project with a default template.
@@ -56,9 +75,26 @@ This command creates a new project directory with the [`sphere-layout`](https://
 - Standard directory structure
 - Example configurations
 
+After creation, initialize and run the project through `make`:
+
+```shell
+cd myproject
+make init
+make run
+```
+
 ### `service`
 
-Generates service code, including both Protobuf definitions and Go service implementations.
+Generates small service skeletons, including Protobuf definitions and Go service implementations. This is a convenience helper, not the main repeatable generation pipeline.
+
+For normal project regeneration, use the Makefile:
+
+```shell
+make gen/db
+make gen/proto
+make gen/docs
+make gen/wire
+```
 
 This command has two subcommands: `proto` and `golang`.
 

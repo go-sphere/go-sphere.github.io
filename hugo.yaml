@@ -108,6 +108,9 @@ menu:
 
 
 params:
+  author:
+    name: Sphere
+    email: ""
   externalLinkDecoration: true
   navbar:
     displayTitle: true

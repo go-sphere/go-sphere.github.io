@@ -3,24 +3,24 @@ title: Protocol & Code Generation
 weight: 23
 ---
 
-Sphere follows a "protocol-first" approach where you define your APIs once in Protobuf and generate everything else from those definitions. This ensures consistency across your entire stack and reduces boilerplate code.
+Sphere follows a "protocol-first" approach where you define API contracts once in Protobuf and generate repeatable transport glue, binding metadata, error types, and documentation from those definitions. This keeps service boundaries consistent without hiding the underlying Go tools.
 
 ## Core Philosophy
 
-The fundamental principle is: **Define once, generate everywhere**.
+The fundamental principle is: **Define once, generate the plumbing**.
 
 Instead of writing HTTP handlers, request/response structs, validation code, and documentation separately, you:
 
 1. **Define services and messages** in `.proto` files
 2. **Annotate with HTTP mappings** using `google.api.http`
 3. **Configure field binding** with Sphere binding options
-4. **Generate everything else** using protoc plugins
+4. **Generate transport and documentation glue** using protoc plugins
 
 This approach provides:
 - **Consistency**: All layers use the same contracts
 - **Type Safety**: Compile-time guarantees across the stack
 - **Documentation**: API docs generated from source of truth
-- **Client SDKs**: Automatically generated for multiple languages
+- **Client SDKs**: Optional clients generated from OpenAPI or other dedicated tools
 - **Reduced Boilerplate**: No manual HTTP handler writing
 
 ## Protocol as Contract

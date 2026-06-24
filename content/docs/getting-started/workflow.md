@@ -3,7 +3,7 @@ title: Development Workflow
 weight: 12
 ---
 
-A typical day-to-day development cycle with Sphere follows this pattern:
+Sphere projects use the generated Makefile as the day-to-day workflow entrypoint. The CLI creates the project; `make`, `go`, `buf`, Wire, Swag, Docker, and project-local tools do the ongoing work.
 
 ## Core Development Loop
 
@@ -24,6 +24,16 @@ A typical day-to-day development cycle with Sphere follows this pattern:
    - Run `make gen/wire` for dependency injection
    - Start with `make run`
    - Test endpoints via Swagger UI (`make run/swag`)
+
+## Tool Boundaries
+
+- `sphere-cli`: create projects, list templates, rename modules, and optionally generate small skeleton files.
+- `make`: run the project workflow.
+- `buf`: manage proto dependencies and generation.
+- `go`: run, test, build, and manage modules.
+- `wire`: generate dependency injection code.
+- `swag`: generate Swagger/OpenAPI files.
+- Docker or CI/CD: build and deploy images when the template supports it.
 
 ## Adding New Features
 
@@ -47,7 +57,7 @@ make run
 **For a new project setup:**
 ```bash
 # 1. Create project
-sphere-cli create --name myproject --mod github.com/user/myproject
+sphere-cli create --name myproject --module github.com/user/myproject
 cd myproject
 
 # 2. Initialize all dependencies and tools
@@ -77,9 +87,12 @@ make run
 - `make gen/wire` → Dependency injection wiring
 - `make gen/dts` → TypeScript client SDKs
 
+Generated artifacts should be safe to clean and recreate. Keep handwritten business logic in `internal/service/**` and `internal/biz/**`, and keep API contracts in `proto/**`.
+
 ## Best Practices
 
 - **Keep services thin**: Move complex business logic to `internal/biz/`
 - **Test early**: Use generated Swagger UI to verify endpoints
 - **Iterate fast**: Small changes → quick regeneration cycles
 - **Version APIs**: Use proto package versioning for breaking changes
+- **Keep tool ownership clear**: Add project workflow to the Makefile instead of expanding the CLI into a build or deployment platform

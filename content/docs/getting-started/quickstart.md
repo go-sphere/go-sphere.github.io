@@ -3,12 +3,12 @@ title: Quick Start
 weight: 11
 ---
 
-Sphere is a pragmatic Go backend toolkit centered on a clean modular monolithic template and a small toolchain that automates schema, API contracts, server stubs, Swagger, and even TypeScript clients.
+Sphere is a thin integration layer for Protobuf-first Go services. It gives you a project template, code generation contracts, and common adapters while leaving day-to-day work to familiar tools such as `make`, `go`, `buf`, Docker, Wire, and Swag.
 
 What you build:
 - Define entities with Ent and APIs with Protobuf  
 - Generate Go handlers, Swagger, error types, and client SDKs
-- Compose services with Gin + Wire; deploy as a single binary
+- Compose services with Gin + Wire; run and build through the project Makefile
 
 ## Prerequisites
 
@@ -37,11 +37,17 @@ sphere-cli --version || sphere-cli -h
 ```bash
 # Create a new project using the template
 # Replace 'myproject' with your project name and update the Go module path
-sphere-cli create --name myproject --mod github.com/yourusername/myproject
+sphere-cli create --name myproject --module github.com/yourusername/myproject
 cd myproject
 ```
 
-This generates a new project with a clean structure based on [`sphere-layout`](https://github.com/go-sphere/sphere-layout) and automatically installs all required protoc plugins and dependencies.
+This generates a project based on [`sphere-layout`](https://github.com/go-sphere/sphere-layout). From this point on, the Makefile is the main workflow entrypoint.
+
+Initialize project dependencies and generated artifacts:
+
+```bash
+make init
+```
 
 ### 2. Define Database Schema (Ent)
 
@@ -172,3 +178,5 @@ make gen/dts
 3. **Business Logic**: Implement service methods in `internal/service/**`
 4. **Wire and Run**: `make gen/wire` → `make run`
 5. **Client SDKs**: `make gen/dts` for TypeScript clients
+
+The CLI is only used at project boundaries. It creates a project, lists templates, and can generate small service skeletons. It does not replace the Makefile, Buf, Go commands, Docker, or deployment tooling.
