@@ -3,23 +3,32 @@ title: protoc-gen-sphere
 weight: 33
 ---
 
-Generates HTTP server code from `.proto` service definitions, using `google.api.http` annotations and Sphere server utilities (Gin-based).
+Generates HTTP server code from `.proto` service definitions, using `google.api.http` annotations and Sphere's `httpx` / `httpz` runtime.
 
 Install
 - `go install github.com/go-sphere/protoc-gen-sphere@latest`
 
 Key Flags
-- `version`: print version
-- `omitempty`: skip files without `google.api.http` (default true)
-- `omitempty_prefix`: apply omitempty only to prefixed paths
-- `template_file`: custom go text/template
-- `swagger_auth_header`: auth header comment for Swagger
-- `router_type`: router type (default `github.com/gin-gonic/gin;IRouter`)
-- `context_type`: context type (default `github.com/gin-gonic/gin;Context`)
-- `data_resp_type`: data model with generics (default `github.com/go-sphere/sphere/server/ginx;DataResponse`)
-- `error_resp_type`: error model (default `github.com/go-sphere/sphere/server/ginx;ErrorResponse`)
-- `server_handler_func`: wrapper (default `github.com/go-sphere/sphere/server/ginx;WithJson`)
-- `parse_json_func`, `parse_uri_func`, `parse_form_func`: request parsing hooks
+
+Type flags use the `import/path;Identifier` format.
+
+| Flag | Description | Default |
+| --- | --- | --- |
+| `version` | Print version and exit | `false` |
+| `omitempty` | Skip files whose methods have no `google.api.http` option | `true` |
+| `omitempty_prefix` | When set, `omitempty` only applies to files with this prefix | `""` |
+| `fail_on_warn` | Treat generation warnings as errors (skipped streaming methods, GET/DELETE declaring a body, missing body) | `false` |
+| `template_file` | Custom Go text/template; empty uses the embedded default | `""` |
+| `swagger_auth_header` | Comment injected as the authorization header in generated Swagger docs | `// @Param Authorization header string false "Bearer token"` |
+| `router_type` | Router type | `github.com/go-sphere/httpx;Router` |
+| `context_type` | Request context type | `github.com/go-sphere/httpx;Context` |
+| `handler_type` | Type returned by each generated handler | `github.com/go-sphere/httpx;Handler` |
+| `context_load_func` | Expression appended to the context value to obtain a `context.Context` | `.Context()` |
+| `data_resp_type` | Success envelope; must support generics | `github.com/go-sphere/sphere/server/httpz;DataResponse` |
+| `error_resp_type` | Error envelope | `github.com/go-sphere/sphere/server/httpz;ErrorResponse` |
+| `server_handler_func` | Wrapper that adapts the generated handler to the response model; must support generics | `github.com/go-sphere/sphere/server/httpz;WithJson` |
+
+Request binding no longer uses standalone `parse_*_func` flags. Binding is performed through methods on the configured `context_type` (`BindJSON` / `BindQuery` / `BindURI` / `BindHeader` / `BindForm`). Customize binding by changing `context_type`.
 
 Buf Example
 ```yaml
@@ -43,5 +52,7 @@ plugins:
 ```
 
 Notes
-- Works hand-in-hand with Sphere’s Gin helpers: `WithJson`, `ShouldBindJSON`, `ShouldBindUri`, `ShouldBindQuery`
-- Pair with [`protoc-gen-sphere-binding`](https://github.com/go-sphere/protoc-gen-sphere-binding) to inject binding tags into generated structs
+- Generated handlers take and return `httpx` types. The default wrapper is `httpz.WithJson`.
+- GET, HEAD, DELETE, and OPTIONS never emit `BindJSON`. If a proto still declares `body` on those methods, the plugin warns (or fails with `fail_on_warn`) and generates the handler without a body bind.
+- Pair with [`protoc-gen-sphere-binding`](https://github.com/go-sphere/protoc-gen-sphere-binding) to inject binding tags into generated structs.
+- Official templates wrap Gin, Fiber, Echo, or Hertz behind `httpx` adapters. Changing `router_type` / `context_type` is how you retarget the generated code.

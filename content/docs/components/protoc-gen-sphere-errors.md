@@ -9,12 +9,18 @@ This code is inspired by [`protoc-gen-go-errors`](https://github.com/go-kratos/k
 
 ## Features
 
-- Generates error structs with HTTP status codes
-- Supports custom error messages and reasons
-- Provides `Join` and `JoinWithMessage` methods for error composition
-- Integrates with the sphere error handling framework
+- Generates helpers with HTTP status codes, application codes, and messages
+- Uses `reason` in `Error()` when set; otherwise uses the enum value name
+- Provides `Join` and `JoinWithMessage` methods for error composition via `httpx.NewError`
 - Supports default status codes for enum types
-- Individual error value customization through options
+- Deduplicates `allow_alias` enum values so generated switches compile
+- Skips the zero-value `*_UNSPECIFIED` entry as a returned business error in generated helpers
+
+## Configuration Parameters
+
+- **`version`**: Print the plugin version and exit. (Default: `false`)
+- **`new_errors_func`**: Constructor used by `Join` / `JoinWithMessage`. Format: `import/path;Ident`. (Default: `github.com/go-sphere/httpx;NewError`)
+- **`template_file`**: Path to a custom Go template. Empty uses the embedded default.
 
 ## Installation
 
@@ -107,13 +113,14 @@ enum UserError {
 
 The plugin generates Go code with the following methods for each error enum:
 
-- `Error() string` - Returns a string representation of the error
-- `GetCode() int32` - Returns the error code (enum value)
-- `GetStatus() int32` - Returns the HTTP status code
-- `GetMessage() string` - Returns the custom error message
-- `GetReason() string` - Returns the error reason (if specified)
-- `Join(errs ...error) error` - Wraps the error with additional errors
-- `JoinWithMessage(msg string, errs ...error) error` - Wraps with custom message
+- `Error() string` — implements `error`. Returns `reason` when set, otherwise the enum value name.
+- `GetCode() int32` — the numeric enum value (e.g. `1001`)
+- `GetStatus() int32` — the HTTP status code
+- `GetMessage() string` — the user-facing default message
+- `Join(errs ...error) error` — wraps causes with `httpx.NewError`
+- `JoinWithMessage(msg string, errs ...error) error` — same, with a runtime message
+
+There is no generated `GetReason()` method. `reason` is only used as the `Error()` string. The enum itself implements `httpx.StatusError`, `httpx.CodeError`, and `httpx.MessageError`, so returning it directly from a service method is valid.
 
 ## Usage in Code
 
@@ -178,12 +185,13 @@ When used with Sphere's HTTP server utilities, these errors are automatically co
 
 ```json
 {
-  "status": 404,
+  "success": false,
   "code": 2001,
-  "error": "USER_NOT_FOUND",
   "message": "User not found"
 }
 ```
+
+`ErrorResponse.Error` (`err.Error()`) is added only when `httpz.SetDebugMode(true)`. Unclassified errors (plain `fmt.Errorf`, driver errors) report `code: 0` and a generic HTTP status message. See [Error Handling](../guides/error-handling) and [HTTP Runtime](../guides/http-runtime).
 
 ## Best Practices
 
@@ -196,6 +204,6 @@ When used with Sphere's HTTP server utilities, these errors are automatically co
 
 ## Integration Notes
 
-- Sphere's Gin layer maps these to structured JSON with correct HTTP status
-- Pair with a global error parser if you need to merge validation/notfound/custom errors
-- The generated errors integrate seamlessly with Sphere's server utilities for consistent API responses
+- `httpz.WithJson` maps these errors to structured JSON with the correct HTTP status
+- Pair with `httpz.SetDefaultErrorParser` if you need to merge validation, not-found, or domain errors
+- The generated errors implement `httpx.Error` interfaces so the runtime can read status, code, and message without extra wrapping

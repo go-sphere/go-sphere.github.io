@@ -36,7 +36,7 @@ Those concerns should stay in focused tools and project templates. Sphere can pr
 Official templates choose a default stack to make new projects immediately useful:
 
 - Buf for Protobuf dependency and generation management;
-- Gin-compatible HTTP handlers;
+- `httpx` HTTP handlers with a Gin adapter by default;
 - Ent or Bun for persistence;
 - Wire for dependency injection;
 - Swagger/OpenAPI and TypeScript client generation;

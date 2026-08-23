@@ -32,7 +32,7 @@ The project structure is designed to:
 ├── assets              # Static files (e.g., UI assets, templates)
 ├── cmd                 # Application entry points
 │   ├── app             # Main application
-│   └── tools           # Developer tools
+│   └── tools           # Developer tools (`gen/ent`, `gen/entcrud`, `gen/entmap`, `config`, `docs`)
 ├── devops              # DevOps and infrastructure files (e.g., Docker, CI/CD)
 ├── internal            # Private application and library code
 │   ├── biz             # Business logic layer (use cases)
@@ -40,7 +40,7 @@ The project structure is designed to:
 │   ├── pkg             # Shared internal packages
 │   │   ├── database    # Database setup, including ent schemas and client
 │   │   └── ...         # Other shared utilities
-│   ├── server          # Server implementation (gRPC, HTTP)
+│   ├── server          # HTTP, docs, bot, and other transport wiring
 │   └── service         # Service layer implementing the API interfaces
 ├── proto               # Protobuf source files (.proto)
 ├── scripts             # Helper scripts for development

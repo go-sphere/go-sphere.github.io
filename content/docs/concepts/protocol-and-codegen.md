@@ -50,9 +50,9 @@ From your proto definitions, you automatically get:
 
 **Server-side Code:**
 - Service interfaces to implement
-- HTTP handlers with proper routing
-- Request binding with validation
-- Response marshaling with proper headers
+- `httpx` HTTP handlers and route registration
+- Request binding with validation (`BindJSON` / `BindQuery` / `BindURI` / …)
+- `httpz` JSON envelopes
 - Error handling with consistent formatting
 
 **Client-side Code:**
@@ -132,5 +132,7 @@ proto/
 
 For detailed information on:
 - **Defining HTTP APIs**: See [API Definitions](../guides/api-definitions)
+- **HTTP runtime**: See [HTTP Runtime](../guides/http-runtime)
 - **Error handling**: See [Error Handling](../guides/error-handling)
 - **Proto packages**: See [Proto Packages & Runtime](proto-packages-and-runtime)
+- **Upgrading**: See [Upgrading to v0.0.4](../guides/upgrading)

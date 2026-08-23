@@ -115,13 +115,14 @@ After running `buf generate`, the plugin will create a file named `{proto_name}_
 
 For each `enum UserError`, the following methods are generated:
 
-- `Error() string`: Returns the error reason, making the type compatible with Go's `error` interface. If `reason` is not set, it returns a string representation of the enum value.
+- `Error() string`: Implements Go's `error` interface. Returns `reason` when set; otherwise the enum value name.
 - `GetCode() int32`: Returns the numeric enum value (e.g., `1001`).
 - `GetStatus() int32`: Returns the configured HTTP status code.
 - `GetMessage() string`: Returns the default error message.
-- `GetReason() string`: Returns the error reason (if specified).
-- `Join(errs ...error) error`: Wraps one or more source errors, returning a `statuserr.Error` that includes the code, status, and message from the enum. This is the recommended way to return an error while preserving the original cause.
+- `Join(errs ...error) error`: Wraps one or more source errors with `httpx.NewError`. This is the recommended way to return an error while preserving the original cause.
 - `JoinWithMessage(msg string, errs ...error) error`: Similar to `Join`, but allows you to provide a custom, dynamic message at runtime.
+
+There is no generated `GetReason()` method. The enum itself implements `httpx.StatusError`, `httpx.CodeError`, and `httpx.MessageError`, so returning it from a service method is enough for `httpz` to set status, code, and message.
 
 ### Example: Returning an Error in Go
 
@@ -177,16 +178,19 @@ func (s *UserService) CreateUser(ctx context.Context, req *CreateUserRequest) (*
 
 ### HTTP Error Response
 
-When this error is handled by Sphere's server layer, it will automatically be converted into an HTTP response with the appropriate status code and JSON body:
+When this error is handled by `httpz.WithJson`, it is converted into an HTTP response with the enum's status code and this JSON body:
 
 ```json
 {
-  "status": 404,
+  "success": false,
   "code": 1001,
-  "error": "USER_NOT_FOUND",
   "message": "User not found"
 }
 ```
+
+`ErrorResponse.Error` is populated with `err.Error()` only when `httpz.SetDebugMode(true)`. Unclassified errors (a plain `error` that does not implement `httpx.CodeError` / `httpx.MessageError`) report `code: 0` and the generic HTTP status text, so driver and database strings are not leaked to clients.
+
+Use `httpz.SetDefaultErrorParser` in the template (see `internal/pkg/render/errors.go`) to map validation and persistence errors before the default `httpx.ParseError` fallback.
 
 ## Error Configuration Options
 
@@ -262,4 +266,4 @@ return nil, UserError_USER_ERROR_VALIDATION_FAILED.Join(
     emailErr, passwordErr, ageErr)
 ```
 
-The generated error types integrate seamlessly with Sphere's HTTP server utilities to provide consistent error responses across your entire API.
+The generated error types implement `httpx`'s error interfaces so `httpz` can produce consistent JSON responses across every adapter.

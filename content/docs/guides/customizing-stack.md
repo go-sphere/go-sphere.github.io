@@ -9,7 +9,7 @@ Sphere templates ship with a complete default stack, but the framework is not de
 
 ### HTTP Router
 
-The default generated HTTP code is optimized for the standard Sphere template. The `httpx` package exists to keep the router boundary small. When replacing the router, preserve:
+The default generated HTTP code targets `httpx`. Official templates wrap Gin (or Fiber, Echo, Hertz) behind an adapter. When replacing the router, preserve:
 
 - generated service interfaces;
 - request binding semantics from `sphere.binding`;
@@ -58,3 +58,5 @@ Sphere does not own deployment orchestration. Templates can provide Docker targe
 - `make init`, `make gen/*`, `make run`, `make build`, `make fmt`, and `make lint` stay discoverable.
 
 If a customization keeps those contracts intact, it is aligned with Sphere's design.
+
+See [HTTP Runtime](http-runtime) for adapter wiring and [Upgrading to v0.0.4](upgrading) for the runtime API break.

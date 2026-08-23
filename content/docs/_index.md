@@ -7,6 +7,8 @@ Sphere is a thin integration layer for Protobuf-first Go services. It provides c
 
 The CLI is intentionally small. After a project is created, the normal workflow is driven by the generated Makefile, Buf, Go, Wire, Swag, Docker, and the third-party libraries selected by the template.
 
+Generated HTTP code targets [`httpx`](https://github.com/go-sphere/httpx). See [HTTP Runtime](guides/http-runtime). The [v0.0.4 upgrade guide](guides/upgrading) covers the breaking runtime changes from v0.0.3.
+
 <!--more-->
 
 {{< cards >}}

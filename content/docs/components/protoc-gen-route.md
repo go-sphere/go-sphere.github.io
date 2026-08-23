@@ -66,10 +66,10 @@ plugins:
     opt:
       - paths=source_relative
       - options_key=bot
-      - request_model=github.com/go-sphere/sphere/social/telegram;Update
-      - response_model=github.com/go-sphere/sphere/social/telegram;Message
-      - extra_data_model=github.com/go-sphere/sphere/social/telegram;MethodExtraData
-      - extra_data_constructor=github.com/go-sphere/sphere/social/telegram;NewMethodExtraData
+      - request_model=github.com/go-sphere/telegram-bot/telegram;Update
+      - response_model=github.com/go-sphere/telegram-bot/telegram;Message
+      - extra_data_model=github.com/go-sphere/telegram-bot/telegram;MethodExtraData
+      - extra_data_constructor=github.com/go-sphere/telegram-bot/telegram;NewMethodExtraData
 ```
 
 ## Proto Definition Example
@@ -87,19 +87,25 @@ service MenuService {
   // UpdateCount handles count update operations
   rpc UpdateCount(UpdateCountRequest) returns (UpdateCountResponse) {
     option (sphere.options.options) = {
-      key: "callback_query"
-      text: "start"
-    };
-    option (sphere.options.options) = {
-      key: "command"
-      text: "start"
+      key: "bot"
+      extra: {
+        key: "command"
+        value: "start"
+      }
+      extra: {
+        key: "callback_query"
+        value: "start"
+      }
     };
   }
   
   rpc ProcessMenu(ProcessMenuRequest) returns (ProcessMenuResponse) {
     option (sphere.options.options) = {
-      key: "callback_query"
-      text: "menu_.*"
+      key: "bot"
+      extra: {
+        key: "callback_query"
+        value: "menu_.*"
+      }
     };
   }
 }
@@ -230,16 +236,21 @@ The plugin is commonly used for routing bot commands in messaging platforms:
 service BotService {
   rpc Start(StartRequest) returns (StartResponse) {
     option (sphere.options.options) = {
-      key: "command"
-      text: "/start"
-    };
-    option (sphere.options.options) = {
-      key: "callback_query"
-      text: "start_.*"
+      key: "bot"
+      extra: {
+        key: "command"
+        value: "/start"
+      }
+      extra: {
+        key: "callback_query"
+        value: "start_.*"
+      }
     };
   }
 }
 ```
+
+`options_key` in `buf.gen.yaml` selects the `key` field (`bot` in the official templates). Command names and callback patterns belong in `extra`.
 
 ### Event Routing
 
@@ -268,7 +279,7 @@ import (
     "log"
     
     botv1 "myproject/api/bot/v1"
-    "github.com/go-sphere/sphere/social/telegram"
+    "github.com/go-sphere/telegram-bot/telegram"
 )
 
 // Implement the server interface
@@ -311,7 +322,7 @@ func main() {
     codec := &MenuServiceCodec{}
     
     // Register handlers
-    handlers := botv1.RegisterMenuServiceBotServer(server, codec)
+    handlers := botv1.RegisterMenuServiceBotServer(server, codec, render)
     
     // Use with your bot framework
     for operation, handler := range handlers {
@@ -351,7 +362,10 @@ service UserService {
     };
     option (sphere.options.options) = {
       key: "bot"
-      text: "user_info"
+      extra: {
+        key: "command"
+        value: "user_info"
+      }
     };
     option (sphere.options.options) = {
       key: "event"
@@ -360,6 +374,8 @@ service UserService {
   }
 }
 ```
+
+`text` is valid when the option value is a single string. Use `extra` when one `key` carries several named fields, as the bot template does.
 
 ## Best Practices
 

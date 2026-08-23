@@ -35,9 +35,7 @@ The behavior of [`protoc-gen-sphere-binding`](https://github.com/go-sphere/proto
 
 ## Usage with Buf
 
-To use [`protoc-gen-sphere-binding`](https://github.com/go-sphere/protoc-gen-sphere-binding) with `buf`, you can configure it in your `buf.gen.yaml` file. **Note**: [`protoc-gen-sphere-binding`](https://github.com/go-sphere/protoc-gen-sphere-binding) cannot be used with the standard `buf.gen.yaml` because it does not generate Go code, but rather modifies the `.proto` files to include Sphere binding tags.
-
-Here is an example configuration:
+`protoc-gen-sphere-binding` does not emit new Go files. It rewrites the `.pb.go` files produced by `protoc-gen-go`. Official templates therefore run it from a second Buf template, typically `buf.binding.yaml`, after `buf generate`:
 
 ```yaml
 version: v2
@@ -47,15 +45,14 @@ managed:
     - file_option: go_package_prefix
       value: github.com/go-sphere/sphere-layout/api
 plugins:
-  - local: protoc-gen-go
-    out: api
-    opt:
-      - paths=source_relative
   - local: protoc-gen-sphere-binding
     out: api
     opt:
       - paths=source_relative
+      - out=api
 ```
+
+The corresponding Makefile step is `buf generate --template buf.binding.yaml`. Putting this plugin in the same `buf.gen.yaml` as `protoc-gen-go` is not reliable, because the rewrite must see the already-generated structs.
 
 ## How It Works
 
@@ -177,7 +174,7 @@ message SearchRequest {
 
 ### Oneof Support
 
-The plugin also supports oneof fields with default configurations:
+`protoc-gen-go` emits each oneof member on a wrapper struct (`Message_Field`). The binding plugin tags those wrappers, not the parent message field.
 
 ```protobuf
 message TestRequest {
@@ -190,6 +187,8 @@ message TestRequest {
   }
 }
 ```
+
+JSON codecs still handle oneof awkwardly on the wire. Prefer dedicated request messages for HTTP APIs unless you have a specific reason to use oneof.
 
 ### Custom Tags
 
@@ -207,39 +206,27 @@ message DatabaseModel {
 
 ## Usage in HTTP Handlers
 
-The generated tags work seamlessly with Gin's binding functions:
+Generated handlers call methods on `httpx.Context`. You normally do not write this by hand:
 
 ```go
-func (s *TestService) RunTest(c *gin.Context) {
-    var req RunTestRequest
-    
-    // Bind URI parameters
-    if err := c.ShouldBindUri(&req); err != nil {
-        c.JSON(400, gin.H{"error": err.Error()})
-        return
-    }
-    
-    // Bind query parameters
-    if err := c.ShouldBindQuery(&req); err != nil {
-        c.JSON(400, gin.H{"error": err.Error()})
-        return
-    }
-    
-    // Bind JSON body
-    if err := c.ShouldBindJSON(&req); err != nil {
-        c.JSON(400, gin.H{"error": err.Error()})
-        return
-    }
-    
-    // Bind headers
-    if err := c.ShouldBindHeader(&req); err != nil {
-        c.JSON(400, gin.H{"error": err.Error()})
-        return
-    }
-    
-    // Process request...
+func _TestService_RunTest0_HTTP_Handler(srv TestServiceHTTPServer) httpx.Handler {
+    return httpz.WithJson(func(ctx httpx.Context) (*RunTestResponse, error) {
+        var in RunTestRequest
+        if err := ctx.BindJSON(&in); err != nil {
+            return nil, err
+        }
+        if err := ctx.BindQuery(&in); err != nil {
+            return nil, err
+        }
+        if err := ctx.BindURI(&in); err != nil {
+            return nil, err
+        }
+        return srv.RunTest(ctx.Context(), &in)
+    })
 }
 ```
+
+`BindHeader` and `BindForm` are used when the corresponding binding locations are present.
 
 ## Integration with Other Generators
 
@@ -254,7 +241,7 @@ func (s *TestService) RunTest(c *gin.Context) {
 1. **Use consistent binding locations**: Establish patterns for where different types of data should be bound from
 2. **Leverage message-level defaults**: Use `default_location` and `default_auto_tags` to reduce repetition
 3. **Be explicit when needed**: Override defaults with field-level annotations when necessary
-4. **Test your bindings**: Verify that the generated tags work correctly with your HTTP framework
+4. **Test your bindings**: Verify that the generated tags work with the `httpx` adapter you actually run
 5. **Keep it simple**: Avoid overly complex binding patterns that might confuse API consumers
 
 ## Troubleshooting

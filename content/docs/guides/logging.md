@@ -3,11 +3,13 @@ title: Logging
 weight: 43
 ---
 
-Sphere provides a flexible logging system built on `go.uber.org/zap` for high-performance structured logging. It supports console and file outputs for both development and production environments.
+Sphere's `log` package is a backend-agnostic structured logger. Package-level `Debug` / `Info` / `Warn` / `Error` calls go through a global logger that starts as a stdio backend (logfmt on stdout, Error+ on stderr). Call `log.InitWithBackends` early in `main`, or let `boot.WithLoggerBackend` do it.
+
+Official templates still store a `zapx.Config` in `config.json` and install a zap backend at boot.
 
 ## Configuration
 
-Configure logging through your `config.json` file:
+Configure the zap backend through your `config.json` file:
 
 ```json
 {
@@ -28,45 +30,55 @@ Configure logging through your `config.json` file:
 
 ### Configuration Options
 
-- `level`: Minimum log level (`debug`, `info`, `warn`, `error`)
+- `level`: Minimum log level for zap (`debug`, `info`, `warn`, `error`). `log.WithMinLevel` does not apply to zapx; set this field instead.
 - `console.disable`: Disable console output (default: `false`)
 - `file`: File logging configuration (optional)
-  - `file_name`: Log file path
+  - `file_name`: Log file path. Empty disables the file sink.
   - `max_size`: Max file size in MB before rotation
   - `max_backups`: Number of backup files to keep
   - `max_age`: Days to retain old files
 
-## Basic Usage
-
-### Standard Logging
-
-Use global logging functions with structured fields:
+## Initialization
 
 ```go
-package main
-
-import "github.com/go-sphere/sphere/log"
+import (
+    "github.com/go-sphere/sphere/core/boot"
+    "github.com/go-sphere/sphere/log"
+    "github.com/go-sphere/sphere/log/zapx"
+)
 
 func main() {
-    log.Debug("Debug message")
-    log.Info("User created", log.String("user", "john"))
-    log.Warn("Warning message")
-    log.Error("Error occurred", log.Err(err))
+    backend := zapx.NewBackend(conf.Log, log.WithAttrs(map[string]any{
+        "service": "user-api",
+        "version": version,
+    }))
+    err := boot.Run(conf, app, boot.WithLoggerBackend(backend))
 }
 ```
 
-### Printf-style Logging
+`WithLoggerBackend` installs the backend before start and syncs it after stop. If the backend implements `SlogLogger`, it also becomes the default `log/slog` handler.
 
-You can also use formatted logging:
+`boot.WithLoggerInit(version, conf.Log)` still exists as a deprecated wrapper around the same path. New code should construct the backend explicitly.
+
+To install the logger without boot:
 
 ```go
-log.Infof("User %s created with ID %d", username, userID)
-log.Errorf("Failed to connect to %s: %v", host, err)
+log.InitWithBackends(zapx.NewBackend(conf.Log))
+defer log.Sync()
 ```
 
-### Structured Logging
+`InitWithBackends` does not close the previous backend. An empty or all-nil list keeps the current logger and warns on stderr. Pass `log.NewNopBackend()` to discard logs on purpose.
 
-Add context using structured fields:
+## Basic Usage
+
+```go
+log.Debug("Debug message")
+log.Info("User created", log.String("user", "john"))
+log.Warn("Warning message")
+log.Error("Error occurred", log.Err(err))
+```
+
+Printf-style helpers exist (`Infof`, `Errorf`, …) but structured fields are preferred.
 
 ```go
 log.Info("User operation",
@@ -78,35 +90,22 @@ log.Info("User operation",
 ### Available Field Types
 
 ```go
-log.String("key", "value")          // String field
-log.Int("count", 42)                // Integer field  
-log.Int64("timestamp", time.Now().Unix())  // 64-bit integer
-log.Float64("score", 98.5)          // Float field
-log.Bool("success", true)           // Boolean field
-log.Duration("elapsed", duration)    // Time duration
-log.Time("created_at", time.Now())  // Time field
-log.Err(err)                        // Error field (key="error")
-log.Any("data", complexObject)      // Any type
+log.String("key", "value")
+log.Int("count", 42)
+log.Int64("timestamp", time.Now().Unix())
+log.Uint64("size", n)
+log.Float64("score", 98.5)
+log.Bool("success", true)
+log.Duration("elapsed", duration)
+log.Time("created_at", time.Now())
+log.Err(err)                     // key="error"
+log.Any("data", complexObject)
+log.Group("req", log.String("id", id))
 ```
+
+Fields are `slog.Attr` values. There is also a `log.Field` alias for compatibility.
 
 ## Logger Instances
-
-Create logger instances with additional context:
-
-```go
-// Create a logger with predefined attributes
-logger := log.With(log.WithAttrs(map[string]any{
-    "service": "user-service",
-    "version": "1.0.0",
-}))
-
-logger.Info("Service started")
-// Output includes: {"service": "user-service", "version": "1.0.0", "message": "Service started"}
-```
-
-### Multiple Options
-
-You can combine multiple options:
 
 ```go
 logger := log.With(
@@ -118,211 +117,62 @@ logger := log.With(
 logger.Info("Processing request")
 ```
 
-## Usage Examples
+Context-aware methods (`InfoContext`, `ErrorContext`, …) pass the caller's `context.Context` to the backend. `WrapBackendWithContextMerge` can inject attributes from that context.
 
-### HTTP Handler Logging
+### Options
 
-```go
-func (h *UserHandler) CreateUser(c *gin.Context) {
-    logger := log.With(log.WithAttrs(map[string]any{
-        "handler": "CreateUser",
-        "trace_id": c.GetString("trace_id"),
-    }))
-    
-    logger.Info("Request received")
-    
-    var req CreateUserRequest
-    if err := c.ShouldBindJSON(&req); err != nil {
-        logger.Error("Invalid request", log.Err(err))
-        c.JSON(400, gin.H{"error": "Invalid request"})
-        return
-    }
-    
-    user, err := h.userService.Create(c.Request.Context(), &req)
-    if err != nil {
-        logger.Error("Failed to create user", 
-            log.Err(err),
-            log.String("email", req.Email))
-        c.JSON(500, gin.H{"error": "Internal error"})
-        return
-    }
-    
-    logger.Info("User created", 
-        log.String("user_id", user.ID),
-        log.String("email", user.Email))
-    
-    c.JSON(201, user)
-}
-```
+- `log.WithName(name)` — logger name
+- `log.AddCaller()` / `log.DisableCaller()` — file:line
+- `log.WithAttrs(map[string]any{...})` — attributes on every line
+- `log.WithMinLevel(level)` — drop entries below this level on `StdioBackend`. Ignored by zapx; set `zapx.Config.Level` instead.
+- `log.WithStackAt(level)` — attach a stack at that level and above. It is **not** a level filter.
 
-### Business Logic Logging
+`StdioBackend` used to treat `WithStackAt` as a minimum-level filter. Code that relied on that should switch to `WithMinLevel`.
+
+## HTTP Handler Logging
 
 ```go
-func (s *UserService) Create(ctx context.Context, req *CreateUserRequest) (*User, error) {
+func (s *UserService) CreateUser(ctx context.Context, req *CreateUserRequest) (*User, error) {
     logger := log.With(log.WithAttrs(map[string]any{
         "service": "UserService",
-        "method": "Create",
+        "method":  "Create",
     }))
-    
-    logger.Debug("Validating input", log.String("email", req.Email))
-    
-    if err := s.validateEmail(req.Email); err != nil {
-        logger.Warn("Validation failed", log.Err(err))
-        return nil, err
-    }
-    
+
     user, err := s.repo.Create(ctx, req)
     if err != nil {
         logger.Error("Database error", log.Err(err))
         return nil, err
     }
-    
+
     logger.Info("User created", log.String("user_id", user.ID))
     return user, nil
 }
 ```
 
+Keep logging in the service layer. Generated HTTP handlers already go through `httpz`; they do not need per-request `*gin.Context` log calls.
+
 ## Best Practices
 
-### Log Levels
-- **Debug**: Detailed diagnostic information
-- **Info**: General application flow
-- **Warn**: Potentially harmful situations  
-- **Error**: Error events that don't stop the application
+- Use structured fields instead of `fmt.Sprintf` in the message
+- Do not log passwords, tokens, or raw request bodies
+- Include operation name and identifiers on error lines
+- Prefer `log.Err(err)` over embedding the error in the message
 
 ```go
-log.Debug("Processing input", log.Int("size", len(data)))
-log.Info("Server started", log.String("port", ":8080"))
-log.Warn("Rate limit approaching", log.String("user", userID))
-log.Error("Database error", log.Err(err))
-```
-
-### Error Handling
-Always include error context:
-
-```go
-if err != nil {
-    log.Error("Operation failed",
-        log.Err(err),
-        log.String("operation", "user_creation"),
-        log.String("user_id", userID))
-    return err
-}
-```
-
-### Performance Tips
-- Use appropriate log levels for each environment
-- Avoid logging sensitive data (passwords, tokens)
-- Use structured fields instead of string formatting
-
-```go
-// Good - structured
-log.Info("User login", 
+// Good
+log.Info("User login",
     log.String("user_id", userID),
     log.String("ip", clientIP))
 
-// Avoid - formatted strings  
+// Avoid
 log.Info(fmt.Sprintf("User %s logged in from %s", userID, clientIP))
-```
-
-### Context Propagation
-Include relevant context in logs:
-
-```go
-logger := log.With(log.WithAttrs(map[string]any{
-    "request_id": getRequestID(ctx),
-    "user_id": getUserID(ctx),
-}))
-
-logger.Info("Processing request")
 ```
 
 ## Log Collection
 
-### File Rotation
-Configure automatic log rotation:
+File rotation is configured on `zapx.Config.File`. For development, [Logdy](https://github.com/logdyhq/logdy-core) can tail the file. For production, ship the JSON file with Promtail / Loki or any other collector; Sphere does not own that pipeline.
 
-```json
-{
-  "log": {
-    "file": {
-      "file_name": "app.log",
-      "max_size": 100,
-      "max_backups": 3,
-      "max_age": 28
-    }
-  }
-}
-```
+## Related
 
-### Simple Log Viewing with Logdy
-For development, use [Logdy](https://github.com/logdyhq/logdy-core) for real-time log viewing:
-
-```bash
-tail -f app.log | logdy
-# or
-logdy follow app.log
-```
-
-### Production Setup with Grafana Loki
-For production, use [Grafana Loki](https://grafana.com/oss/loki/) with Docker Compose:
-
-```yaml
-version: "3.8"
-services:
-  loki:
-    image: grafana/loki:latest
-    ports:
-      - "3100:3100"
-    
-  promtail:
-    image: grafana/promtail:latest
-    volumes:
-      - ./app.log:/var/log/app.log:ro
-      - ./promtail-config.yml:/etc/promtail/config.yml
-    depends_on:
-      - loki
-      
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-```
-
-## Advanced Features
-
-### Initialization with Attributes
-Set global attributes for all logs:
-
-```go
-func main() {
-    config := log.NewDefaultConfig()
-    config.Level = "debug"
-    
-    attrs := map[string]any{
-        "service": "user-api",
-        "version": "1.0.0",
-        "environment": "production",
-    }
-    
-    log.Init(config, attrs)
-    defer log.Sync() // Flush logs before exit
-    
-    log.Info("Application started")
-}
-```
-
-### Logger Options
-Available options for customizing loggers:
-
-```go
-logger := log.With(
-    log.WithName("component-name"),           // Set logger name
-    log.AddCaller(),                         // Include caller info
-    log.WithAttrs(map[string]any{            // Add attributes
-        "module": "auth",
-    }),
-)
-```
+- [HTTP Runtime](http-runtime) — how `httpz` logs panics without leaking them to clients
+- [Upgrading to v0.0.4](upgrading) — logger init and `WithStackAt` behavior changes

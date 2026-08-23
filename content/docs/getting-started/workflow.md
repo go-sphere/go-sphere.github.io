@@ -31,6 +31,7 @@ Sphere projects use the generated Makefile as the day-to-day workflow entrypoint
 - `make`: run the project workflow.
 - `buf`: manage proto dependencies and generation.
 - `go`: run, test, build, and manage modules.
+- `httpx`: generated HTTP handlers; Gin is the default adapter, not the generated API.
 - `wire`: generate dependency injection code.
 - `swag`: generate Swagger/OpenAPI files.
 - Docker or CI/CD: build and deploy images when the template supports it.

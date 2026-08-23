@@ -4,6 +4,8 @@ weight: 30
 ---
 
 Explore Sphere's protoc plugins, CLI tools, and runtime libraries.
+
+Generated HTTP code targets [`httpx`](https://github.com/go-sphere/httpx). Envelope helpers live in `sphere/server/httpz`. See [HTTP Runtime](../guides/http-runtime).
 <!--more-->
 
 {{< cards >}}
