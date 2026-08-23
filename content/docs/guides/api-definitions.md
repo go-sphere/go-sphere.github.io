@@ -75,7 +75,6 @@ The following table shows how Protobuf URL paths are translated:
 | `/static/{path=assets/*}`                        | `/static/assets/:path`                      |
 | `/static/{path=assets/**}`                       | `/static/assets/*path`                      |
 | `/projects/{project_id}/locations/{location=**}` | `/projects/:project_id/locations/*location` |
-| `/v1/users/{user.id}`                            | `/v1/users/:user_id`                        |
 | `/api/{version=v1}/users`                        | `/api/v1/users`                             |
 | `/users/{user_id}/posts/{post_id=drafts}`        | `/users/:user_id/posts/drafts`              |
 | `/docs/{path=guides/**}`                         | `/docs/guides/*path`                        |
@@ -87,9 +86,9 @@ The following table shows how Protobuf URL paths are translated:
 Different HTTP methods have different default binding behaviors:
 
 #### GET, HEAD, DELETE, and OPTIONS Requests
-- Path parameters are bound to fields marked with `BINDING_LOCATION_URI`
-- All other fields become query parameters by default
-- No request body is expected
+- Path parameters must be top-level fields marked with `BINDING_LOCATION_URI`. Nested templates such as `{user.id}` are not supported.
+- Remaining fields must be marked `BINDING_LOCATION_QUERY`, `BINDING_LOCATION_HEADER`, or `BINDING_LOCATION_FORM` (or the message `default_location`). Unmarked fields fail generation.
+- No request body is expected. JSON-bound fields on these methods fail generation.
 - If `google.api.http` still declares `body`, `protoc-gen-sphere` warns (or fails with `fail_on_warn`) and generates the handler **without** `BindJSON`
 
 #### POST, PUT, and PATCH Requests
@@ -232,7 +231,7 @@ message GetUserNameResponse {
 
 4. **Avoid overly broad wildcards** in paths to prevent ambiguous routing
 5. **Prefer explicit body field** (`body: "fieldName"`) when payloads are nested
-6. **Prefer not to use `oneof`** in HTTP-exposed request/response messages. Binding tags now land on the generated wrapper structs, but JSON codecs still handle oneof awkwardly on the wire.
+6. **Prefer not to use `oneof`** in HTTP-exposed request/response messages. Tags land on wrapper structs (`Message_Field`); generated handlers bind the parent request, so QUERY/URI/HEADER oneof members are not filled by `BindQuery`/`BindURI`/`BindHeader`. JSON codecs also handle oneof awkwardly on the wire.
 
 
 ## Integration with buf

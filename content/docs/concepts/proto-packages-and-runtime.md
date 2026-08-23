@@ -106,10 +106,13 @@ Official templates still use Gin as the default engine, but generated code talks
 func _UserService_GetUser0_HTTP_Handler(srv UserServiceHTTPServer) httpx.Handler {
     return httpz.WithJson(func(ctx httpx.Context) (*User, error) {
         var in GetUserRequest
-        if err := ctx.BindURI(&in); err != nil {
+        if err := ctx.BindHeader(&in); err != nil {
             return nil, err
         }
         if err := ctx.BindQuery(&in); err != nil {
+            return nil, err
+        }
+        if err := ctx.BindURI(&in); err != nil {
             return nil, err
         }
         return srv.GetUser(ctx.Context(), &in)

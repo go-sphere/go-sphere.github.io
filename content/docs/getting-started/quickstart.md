@@ -109,6 +109,7 @@ package api.v1;
 
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
+import "sphere/binding/binding.proto";
 import "shared/v1/user.proto";
 
 service UserService {
@@ -127,7 +128,10 @@ service UserService {
 }
 
 message GetUserRequest {
-  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+  int64 id = 1 [
+    (sphere.binding.location) = BINDING_LOCATION_URI,
+    (buf.validate.field).int64.gt = 0
+  ];
 }
 
 message CreateUserRequest {

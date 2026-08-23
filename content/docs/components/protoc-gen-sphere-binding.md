@@ -172,9 +172,15 @@ message SearchRequest {
 }
 ```
 
+### Nested types
+
+Nested message type definitions do not inherit `default_location` from the enclosing message. A nested JSON object under a QUERY-default parent keeps its `json` tags. Map-entry types are skipped.
+
 ### Oneof Support
 
 `protoc-gen-go` emits each oneof member on a wrapper struct (`Message_Field`). The binding plugin tags those wrappers, not the parent message field.
+
+Generated HTTP handlers bind the parent request. Gin/httpx binders do not follow oneof wrappers, so QUERY/URI/HEADER oneof members are not populated at runtime. Prefer dedicated request messages for HTTP APIs.
 
 ```protobuf
 message TestRequest {
@@ -188,7 +194,7 @@ message TestRequest {
 }
 ```
 
-JSON codecs still handle oneof awkwardly on the wire. Prefer dedicated request messages for HTTP APIs unless you have a specific reason to use oneof.
+JSON codecs also handle oneof awkwardly on the wire.
 
 ### Custom Tags
 
