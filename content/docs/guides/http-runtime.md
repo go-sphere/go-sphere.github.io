@@ -97,7 +97,14 @@ httpz.SetDefaultErrorParser(func(err error) (int32, int32, string) {
 })
 ```
 
-The parser return is `(code, status, message)`. `AbortWithJsonError` still zeros `code` and replaces `message` unless the error implements the corresponding `httpx` interfaces. For a custom parser message to reach the client, wrap with `httpx.NewError` (or return a generated proto error).
+The parser return is `(code, status, message)`.
+
+- `code` is still zeroed unless the error implements `httpx.CodeError`.
+- `message` from `httpx.MessageError` always wins when non-empty.
+- Otherwise a parser message is kept when it is **not** `err.Error()` (so joined validation text is returned, but `httpx.ParseError`'s raw-error fallback is not).
+- Adapter default error handlers use `httpx.RenderError` (status + `{success, code, message}`, no `error` field). Official templates install `httpz.AbortWithJsonError` as the gin error handler so middleware failures use the same envelope as `WithJson`.
+
+`NewXxxError(msg)` / `NewWithStatus(status, msg)` put `msg` in `GetMessage()`. `XxxError(err)` without extra arguments still has an empty user message and becomes the generic status text. Bind failures are wrapped as `httpx.BadRequestError` in every adapter.
 
 ## Related
 

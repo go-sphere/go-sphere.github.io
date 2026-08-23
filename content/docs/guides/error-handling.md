@@ -190,7 +190,7 @@ When this error is handled by `httpz.WithJson`, it is converted into an HTTP res
 
 `ErrorResponse.Error` is populated with `err.Error()` only when `httpz.SetDebugMode(true)`. Unclassified errors (a plain `error` that does not implement `httpx.CodeError` / `httpx.MessageError`) report `code: 0` and the generic HTTP status text, so driver and database strings are not leaked to clients.
 
-Use `httpz.SetDefaultErrorParser` in the template (see `internal/pkg/render/errors.go`) to map validation and persistence errors before the default `httpx.ParseError` fallback.
+Use `httpz.SetDefaultErrorParser` in the template (see `internal/pkg/render/errors.go`) to map validation and persistence errors before the default `httpx.ParseError` fallback. Parser messages that are not the raw `err.Error()` string reach the client (joined protovalidate text); Ent not-found/constraint mappings should use generic status text so schema names stay off the wire. Official templates also install `httpz.AbortWithJsonError` as the gin error handler so middleware failures use the same envelope as `WithJson`.
 
 ## Error Configuration Options
 
