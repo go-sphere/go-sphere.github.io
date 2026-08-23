@@ -5,13 +5,11 @@ weight: 45
 
 `sphere` v0.0.4 is a breaking runtime release. Generated HTTP code already targeted `httpx` / `httpz` in v0.0.3; this release tightens contracts (cache TTL, `Close` ownership, error envelopes, boot/task lifecycle) and fixes security bugs that cannot keep the old signatures.
 
-After the tag:
-
 ```bash
 go get github.com/go-sphere/sphere@v0.0.4
 ```
 
-Then apply the call-site changes below. Official templates (`sphere-layout`, `sphere-simple-layout`, `sphere-bun-layout`) still pin v0.0.3 until they are bumped in a follow-up; new code against v0.0.4 should follow this page, not the old template snippets.
+Then apply the call-site changes below. Official templates (`sphere-layout`, `sphere-simple-layout`, `sphere-bun-layout`) have been bumped to v0.0.4. Existing projects created from older templates still need this page.
 
 The authoritative lists live in the sphere module:
 
@@ -78,6 +76,6 @@ v0.0.3 differences this removes:
 - `WithStackAt` only attaches stacks. Use `WithMinLevel` to filter `StdioBackend`.
 - `InitWithBackends` with no usable backend keeps the current logger.
 
-## Templates after the tag
+## Templates
 
-Bump the layout modules only after `v0.0.4` is tagged. Until then they still compile against v0.0.3 (`CryptPassword` one return value, `boot.WithLoggerInit`, `cors.NewCORS` without error). That is a template follow-up, not part of tagging `sphere` itself.
+Official templates now depend on `sphere` v0.0.4 and already apply these call-site changes (`WithLoggerBackend`, `cors.NewCORS` error return, `NewRateLimiterByClientIP`). Existing projects created before that bump still need the table above.

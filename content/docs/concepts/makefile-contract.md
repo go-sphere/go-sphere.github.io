@@ -13,9 +13,9 @@ Official templates should keep these target names stable where the capability ex
 
 | Target | Purpose |
 | --- | --- |
-| `make init` | Download modules, install required local tools, and prepare the project. |
+| `make init` | Download modules, install required local tools, generate artifacts, and write `config.json` if it is missing. |
 | `make install` | Install local development tools such as Buf, Wire, Swag, protoc plugins, and linters. |
-| `make gen/conf` | Generate example configuration. |
+| `make gen/conf` | Generate example configuration (`config_gen.json`) and write `config.json` if it is missing. |
 | `make gen/db` | Generate persistence code for the template's selected ORM. |
 | `make gen/proto` | Run Protobuf generation and Sphere protoc plugins. |
 | `make gen/docs` | Generate Swagger/OpenAPI documentation. |
@@ -23,6 +23,7 @@ Official templates should keep these target names stable where the capability ex
 | `make gen/all` | Clean and regenerate the full generated surface. |
 | `make gen/dts` | Generate TypeScript clients when the template supports it. |
 | `make run` | Run the application locally. |
+| `make run/race` | Run locally with the race detector. Requires cgo; not the default `run` target. |
 | `make run/swag` | Serve generated Swagger UI when available. |
 | `make build` | Build a binary for the current platform. |
 | `make build/docker` | Build a Docker image when the template provides Docker support. |

@@ -49,6 +49,8 @@ Initialize project dependencies and generated artifacts:
 make init
 ```
 
+`make init` also writes `config.json` when that file is missing, so `make run` has a config to load.
+
 ### 2. Define Database Schema (Ent)
 
 Create your database entities in `internal/pkg/database/schema/`. For example, create `internal/pkg/database/schema/user.go`:
