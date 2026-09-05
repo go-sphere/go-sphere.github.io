@@ -1,3 +1,3 @@
 module github.com/go-sphere/go-sphere.github.io
 
-go 1.25.0
+go 1.26.8
