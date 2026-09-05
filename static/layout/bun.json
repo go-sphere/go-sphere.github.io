@@ -1,5 +1,6 @@
 {
-  "uri": "https://github.com/go-sphere/sphere-bun-layout/archive/refs/heads/master.zip",
-  "mod": "github.com/go-sphere/sphere-bun-layout",
-  "path": "sphere-bun-layout-master"
+  "name": "bun",
+  "source": "https://github.com/go-sphere/sphere-bun-layout.git",
+  "ref": "master",
+  "mod": "github.com/go-sphere/sphere-bun-layout"
 }

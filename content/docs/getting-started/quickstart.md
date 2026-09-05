@@ -41,7 +41,7 @@ sphere-cli create --name myproject --module github.com/yourusername/myproject
 cd myproject
 ```
 
-This generates a project based on [`sphere-layout`](https://github.com/go-sphere/sphere-layout). From this point on, the Makefile is the main workflow entrypoint.
+This generates a project based on [`sphere-layout`](https://github.com/go-sphere/sphere-layout). The generated `.sphere/layout.lock.json` records the exact upstream commit for future AI-assisted template synchronization. From this point on, the Makefile is the main workflow entrypoint.
 
 Initialize project dependencies and generated artifacts:
 

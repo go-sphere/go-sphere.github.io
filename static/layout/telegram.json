@@ -1,0 +1,6 @@
+{
+  "name": "telegram",
+  "source": "https://github.com/go-sphere/sphere-telegram-layout.git",
+  "ref": "master",
+  "mod": "github.com/go-sphere/sphere-telegram-layout"
+}

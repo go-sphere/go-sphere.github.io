@@ -3,7 +3,7 @@ title: sphere-cli
 weight: 31
 ---
 
-Sphere CLI (`sphere-cli`) is a small bootstrap tool for [`sphere`](https://github.com/go-sphere/sphere) projects. It creates projects from templates, lists available templates, renames module paths, and provides lightweight service skeleton helpers.
+Sphere CLI (`sphere-cli`) is a small bootstrap tool for [`sphere`](https://github.com/go-sphere/sphere) projects. It creates projects from templates, records the exact upstream template revision, lists available templates, renames module paths, and provides lightweight service skeleton helpers.
 
 It is intentionally not the primary build, deploy, or runtime orchestration tool. After a project is created, the generated Makefile, Buf, Go, Wire, Swag, Docker, and project-local tools own the day-to-day workflow.
 
@@ -38,6 +38,7 @@ Here is an overview of the available commands.
 `sphere-cli` is responsible for:
 
 - creating projects from official or custom templates;
+- recording a Git-backed layout's exact source revision in `.sphere/layout.lock.json`;
 - listing available templates;
 - renaming Go module paths;
 - generating small service skeletons when useful.
@@ -56,13 +57,18 @@ Initializes a new Sphere project with a default template.
 
 **Usage:**
 ```shell
-sphere-cli create --name <project-name> [--module <go-module-name>] [--layout <template-uri>]
+sphere-cli create --name <project-name> [--module <go-module-name>] [--layout <layout-name-or-uri>]
 ```
 
 **Flags:**
 - `--name string`: (Required) The name for the new Sphere project.
 - `--module string`: (Optional) The Go module path for the project.
-- `--layout string`: (Optional) Custom template layout URI.
+- `--layout string`: (Optional) Official layout name or custom layout JSON URI.
+
+Official layout names are `standard` (the default), `simple`, `bun`, and
+`telegram`. Official and custom Git-backed layouts define `source`, `ref`, and
+`mod`; legacy custom ZIP definitions using `uri`, `mod`, and `path` remain
+compatible but cannot record an exact synchronization baseline.
 
 **Example:**
 ```shell
@@ -74,6 +80,7 @@ This command creates a new project directory with the [`sphere-layout`](https://
 - buf configuration for protobuf management
 - Standard directory structure
 - Example configurations
+- `.sphere/layout.lock.json` with the source repository, configured ref, and exact commit SHA
 
 After creation, initialize and run the project through `make`:
 
@@ -82,6 +89,20 @@ cd myproject
 make init
 make run
 ```
+
+### Updating a generated project
+
+There is intentionally no `sphere-cli update` command. An AI agent should read
+the project's `.sphere/layout.json` ownership rules and
+`.sphere/layout.lock.json` baseline, obtain the base and target upstream
+snapshots, normalize their module paths, and perform a three-way merge. It must
+leave project-owned files alone, regenerate generated files, and advance the
+lock only after formatting, tests, lint, and build all pass. The normative
+protocol is `docs/LAYOUT_CONTRACT.md` in `sphere-layout`.
+
+For an older project without a lock, the agent should match the initial Git
+tree against upstream history. If that does not identify one commit uniquely,
+the user must choose the baseline; the agent must not guess.
 
 ### `service`
 

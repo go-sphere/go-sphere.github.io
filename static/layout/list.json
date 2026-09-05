@@ -1,17 +1,22 @@
 [
-    {
-        "name": "standard",
-        "path": "https://go-sphere.github.io/layout/standard.json",
-        "description": "A standard layout with full features."
-    },
-    {
-        "name": "simple",
-        "path": "https://go-sphere.github.io/layout/simple.json",
-        "description": "A simple layout with minimal features."
-    },
-    {
-      "name": "bun",
-      "path": "https://go-sphere.github.io/layout/bun.json",
-      "description": "A simple layout with minimal features with bun integration."
-    }
+  {
+    "name": "standard",
+    "path": "https://go-sphere.github.io/layout/standard.json",
+    "description": "The full Ent layout with password authentication, dashboard, storage, and documentation."
+  },
+  {
+    "name": "simple",
+    "path": "https://go-sphere.github.io/layout/simple.json",
+    "description": "A minimal Protobuf-first service layout without persistence or authentication."
+  },
+  {
+    "name": "bun",
+    "path": "https://go-sphere.github.io/layout/bun.json",
+    "description": "A compact service layout with Bun persistence."
+  },
+  {
+    "name": "telegram",
+    "path": "https://go-sphere.github.io/layout/telegram.json",
+    "description": "The standard Ent layout with an integrated Telegram Bot lifecycle example."
+  }
 ]

@@ -96,6 +96,13 @@ menu:
       params:
         type: link
         icon: terminal
+    - name: sphere-telegram-layout ↗
+      parent: layout
+      url: https://github.com/go-sphere/sphere-telegram-layout
+      weight: 35
+      params:
+        type: link
+        icon: terminal
     - name: Search
       weight: 80
       params:
