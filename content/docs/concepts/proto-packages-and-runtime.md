@@ -72,7 +72,7 @@ See [Error Handling Guide](../guides/error-handling) for implementation details.
 Sphere's HTTP runtime is split in two:
 
 - [`httpx`](https://github.com/go-sphere/httpx) — router/context/handler interfaces, plus adapters for Gin, Fiber, Echo, and Hertz
-- `server/httpz` — JSON envelopes, `WithJson`, and `AbortWithJsonError` on top of `httpx`
+- `server/httpz` — JSON envelopes plus `WithJson`, `WithSSE`, and `AbortWithJsonError` on top of `httpx`
 
 Official templates still use Gin as the default engine, but generated code talks to `httpx`, not `*gin.Context`.
 
@@ -80,6 +80,8 @@ Official templates still use Gin as the default engine, but generated code talks
 
 **Response Wrappers:**
 - `httpz.WithJson[T]`: wraps a handler returning `(T, error)` and serializes success to `DataResponse[T]`
+- `httpz.WithSSE[T]`: wraps a two-phase server-streaming handler; messages become JSON SSE events and completion/failure becomes a terminal `done`/`error` event
+- `httpz.WithSSEEagerCommit`: option for push-style streams that must commit and start heartbeats before their first reply; producer failures then become in-stream errors
 - `httpz.AbortWithJsonError`: normalizes errors to `ErrorResponse` with HTTP status, application `code`, and a user-facing `message`
 
 **Request Binding:**
@@ -98,6 +100,11 @@ Official templates still use Gin as the default engine, but generated code talks
 3. **Handler binds** request data to generated structs (using sphere/binding tags)
 4. **Service method** executes business logic, returns data or a typed error
 5. **`httpz.WithJson`** writes `DataResponse` or routes the error through `AbortWithJsonError`
+
+For `returns (stream Reply)` methods, the generated handler instead prepares an
+`httpz.SSEStream[*Reply]`, then calls the service with a `send` callback. Binding
+errors remain ordinary JSON errors; once the SSE response is committed, later
+failures are terminal `error` events. See [Server Streaming](../guides/server-streaming).
 
 ### Example Handler
 
@@ -124,6 +131,7 @@ func _UserService_GetUser0_HTTP_Handler(srv UserServiceHTTPServer) httpx.Handler
 
 - **Custom Router Types**: swap Gin for Fiber, Echo, or Hertz via `httpx` adapters and [`protoc-gen-sphere`](https://github.com/go-sphere/protoc-gen-sphere) `router_type` / `context_type` flags
 - **Response Envelope**: override `data_resp_type` / `error_resp_type` / `server_handler_func`
+- **Streaming Wrapper**: override `stream_handler_func` / `stream_type` for generated server streams
 - **Error Parser**: `httpz.SetDefaultErrorParser` to merge validation or domain-specific errors
 - **Debug leaks**: `httpz.SetDebugMode(true)` includes `err.Error()` in `ErrorResponse.Error`; production leaves it empty
 

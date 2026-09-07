@@ -30,6 +30,7 @@ Your `.proto` files serve as the authoritative definition of:
 - **API operations** (services and methods)
 - **Error conditions** (enums with metadata)
 - **HTTP mapping** (via annotations)
+- **Transport shape** (unary response or server stream)
 - **Field constraints** (via validation rules)
 
 ## Code Generation Pipeline
@@ -52,7 +53,8 @@ From your proto definitions, you automatically get:
 - Service interfaces to implement
 - `httpx` HTTP handlers and route registration
 - Request binding with validation (`BindJSON` / `BindQuery` / `BindURI` / …)
-- `httpz` JSON envelopes
+- `httpz` JSON envelopes for unary methods
+- `httpz` SSE producers for `returns (stream Reply)` methods
 - Error handling with consistent formatting
 
 **Client-side Code:**
@@ -121,6 +123,7 @@ proto/
 2. **Proper grouping**: Organize by domain and version
 3. **Forward compatibility**: Design for future evolution
 4. **Documentation**: Comment services, methods, and fields
+5. **Streaming intent**: Use server-streaming only when clients benefit from incremental replies; define completion, failure, cancellation, and resume semantics as part of the contract
 
 ### Code Generation
 1. **Frequent regeneration**: Update generated code early and often
@@ -133,6 +136,7 @@ proto/
 For detailed information on:
 - **Defining HTTP APIs**: See [API Definitions](../guides/api-definitions)
 - **HTTP runtime**: See [HTTP Runtime](../guides/http-runtime)
+- **Server streaming**: See [Server Streaming](../guides/server-streaming)
 - **Error handling**: See [Error Handling](../guides/error-handling)
 - **Proto packages**: See [Proto Packages & Runtime](proto-packages-and-runtime)
 - **Upgrading**: See [Upgrading to v0.0.4](../guides/upgrading)

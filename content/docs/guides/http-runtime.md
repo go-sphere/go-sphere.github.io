@@ -9,12 +9,14 @@ Generated HTTP code talks to [`httpx`](https://github.com/go-sphere/httpx), not 
 
 | Layer | Package | Role |
 | --- | --- | --- |
-| Router contract | `github.com/go-sphere/httpx` | `Engine`, `Router`, `Handler`, `Middleware`, `Context` |
+| Router contract | `github.com/go-sphere/httpx` | `Engine`, `Router`, `Handler`, `Middleware`, `Context`, `Streamer` |
 | Adapters | `httpx/ginx`, `httpx/fiberx`, `httpx/echox`, `httpx/hertzx` | Wrap a concrete framework |
-| Envelopes | `github.com/go-sphere/sphere/server/httpz` | `WithJson`, `DataResponse`, `ErrorResponse` |
+| Responses | `github.com/go-sphere/sphere/server/httpz` | `WithJson`, `WithSSE`, `DataResponse`, `ErrorResponse`, `SSEStream` |
 | Middleware | `sphere/server/middleware/*` | Auth, CORS, online, rate limiter, selector |
 
-`protoc-gen-sphere` defaults are `httpx.Router` / `httpx.Context` / `httpx.Handler` and `httpz.WithJson`. See [protoc-gen-sphere](../components/protoc-gen-sphere).
+`protoc-gen-sphere` defaults are `httpx.Router` / `httpx.Context` /
+`httpx.Handler`, with `httpz.WithJson` for unary methods and `httpz.WithSSE`
+for server-streaming methods. See [protoc-gen-sphere](../components/protoc-gen-sphere).
 
 ## Success Envelope
 
@@ -64,6 +66,51 @@ if err := ctx.BindURI(&in); err != nil {
 
 GET/HEAD/DELETE/OPTIONS never call `BindJSON`, even if the proto declared `body`. Enable `fail_on_warn` on `protoc-gen-sphere` if you want that to fail generation instead of warning.
 
+## Streaming
+
+`httpx.Streamer` is the portable incremental-response capability implemented by
+all four official adapters. `httpx.ServerSentEvents` builds SSE framing on top
+of it and provides `SSEWriter.Send`, `SendData`, `SendJSON`, and `Comment`.
+Every event is flushed as one unit.
+
+Generated server-streaming methods use a two-phase `httpz.WithSSE` handler:
+
+```go
+return httpz.WithSSE(func(ctx httpx.Context) (httpz.SSEStream[*WatchResponse], error) {
+    var in WatchRequest
+    if err := ctx.BindQuery(&in); err != nil {
+        return nil, err
+    }
+    stdCtx := ctx.Context()
+    return func(send func(*WatchResponse) error) error {
+        return srv.Watch(stdCtx, &in, send)
+    }, nil
+})
+```
+
+The prepare phase owns request binding and may return a normal JSON error before
+anything is committed. The producer phase must only use captured ordinary Go
+values—not `httpx.Context`—and must stop when `send` fails or the standard
+context is canceled.
+
+By default, the first reply commits a 200 `text/event-stream` response. Reply
+messages are unnamed JSON `data` events, successful completion emits `done`,
+and a later failure emits `error` with the normal `ErrorResponse`. A producer
+failure before its first reply is still rendered as a regular JSON error status.
+After commit, the wrapper emits 15-second keep-alive comments and disables nginx
+buffering. Push endpoints that may wait indefinitely before their first reply
+can opt into eager commit through a custom stream wrapper; see the streaming
+guide for the trade-off.
+
+Gin, Echo, and Hertz additionally implement `httpx.Flusher` for manually
+flushing a response inside a handler. Fiber does not, but its `Streamer`
+implementation works through Fiber's deferred stream writer. In-process
+`httpx.TestRequester` calls buffer the final stream body, so use a real network
+connection to test incremental delivery and disconnect behavior.
+
+See [Server Streaming](server-streaming) for the proto contract, service
+implementation pattern, client behavior, and deployment considerations.
+
 ## Template Wiring
 
 Official templates construct a Gin engine and wrap it:
@@ -109,6 +156,7 @@ The parser return is `(code, status, message)`.
 ## Related
 
 - [API Definitions](api-definitions)
+- [Server Streaming](server-streaming)
 - [Error Handling](error-handling)
 - [Customizing the Stack](customizing-stack)
 - [Upgrading to v0.0.4](upgrading)

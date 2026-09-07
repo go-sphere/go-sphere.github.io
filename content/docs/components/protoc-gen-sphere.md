@@ -17,7 +17,7 @@ Type flags use the `import/path;Identifier` format.
 | `version` | Print version and exit | `false` |
 | `omitempty` | Skip files whose methods have no `google.api.http` option | `true` |
 | `omitempty_prefix` | When set, `omitempty` only applies to files with this prefix | `""` |
-| `fail_on_warn` | Treat generation warnings as errors (skipped streaming methods, GET/DELETE declaring a body, missing body) | `false` |
+| `fail_on_warn` | Treat generation warnings as errors (skipped client/bidirectional streams, ignored streaming `response_body`, invalid body declarations) | `false` |
 | `template_file` | Custom Go text/template; empty uses the embedded default | `""` |
 | `swagger_auth_header` | Comment injected as the authorization header in generated Swagger docs | `// @Param Authorization header string false "Bearer token"` |
 | `router_type` | Router type | `github.com/go-sphere/httpx;Router` |
@@ -27,6 +27,8 @@ Type flags use the `import/path;Identifier` format.
 | `data_resp_type` | Success envelope; must support generics | `github.com/go-sphere/sphere/server/httpz;DataResponse` |
 | `error_resp_type` | Error envelope | `github.com/go-sphere/sphere/server/httpz;ErrorResponse` |
 | `server_handler_func` | Wrapper that adapts the generated handler to the response model; must support generics | `github.com/go-sphere/sphere/server/httpz;WithJson` |
+| `stream_handler_func` | Wrapper for server-streaming SSE handlers; must support generics | `github.com/go-sphere/sphere/server/httpz;WithSSE` |
+| `stream_type` | Generic stream type returned by the streaming prepare phase | `github.com/go-sphere/sphere/server/httpz;SSEStream` |
 
 Request binding no longer uses standalone `parse_*_func` flags. Binding is performed through methods on the configured `context_type` (`BindJSON` / `BindQuery` / `BindURI` / `BindHeader` / `BindForm`). Customize binding by changing `context_type`.
 
@@ -53,6 +55,9 @@ plugins:
 
 Notes
 - Generated handlers take and return `httpx` types. The default wrapper is `httpz.WithJson`.
+- A server-streaming method (`returns (stream Reply)`) generates an SSE handler with `httpz.WithSSE`; its service interface receives `send func(*Reply) error`.
+- Client-streaming and bidirectional methods are skipped with a warning. On a server stream, `response_body` is ignored because each event carries the whole reply message.
 - GET, HEAD, DELETE, and OPTIONS never emit `BindJSON`. If a proto still declares `body` on those methods, the plugin warns (or fails with `fail_on_warn`) and generates the handler without a body bind.
 - Pair with [`protoc-gen-sphere-binding`](https://github.com/go-sphere/protoc-gen-sphere-binding) to inject binding tags into generated structs.
 - Official templates wrap Gin, Fiber, Echo, or Hertz behind `httpx` adapters. Changing `router_type` / `context_type` is how you retarget the generated code.
+- See [Server Streaming](../guides/server-streaming) for the generated contract, wire format, and lifecycle rules.
