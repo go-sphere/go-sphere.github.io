@@ -1,19 +1,20 @@
 GO ?= go
 GOLANGCI_LINT ?= golangci-lint
-
-DIRECT_DEPS_TEMPLATE := {{if and (not .Main) (not .Indirect) (not .Replace)}}{{.Path}}{{end}}
+HUGO ?= hugo
 
 .DEFAULT_GOAL := check
 
 .PHONY: deps-update tidy fmt test lint check
 
+# The module's only dependency is the Hugo theme (github.com/imfing/hextra),
+# which ships no Go packages—so `go mod tidy` would drop it. Use Hugo's module
+# commands, which read module.imports from hugo.yaml.
 deps-update:
-	@deps="$$(GOWORK=off $(GO) list -m -f '$(DIRECT_DEPS_TEMPLATE)' all)"; \
-	if [ -n "$$deps" ]; then GOWORK=off $(GO) get -u $$deps; fi
-	GOWORK=off $(GO) mod tidy
+	$(HUGO) mod get -u
+	$(HUGO) mod tidy
 
 tidy:
-	GOWORK=off $(GO) mod tidy
+	$(HUGO) mod tidy
 
 fmt:
 	$(GO) fmt ./...
@@ -28,6 +29,7 @@ lint:
 	$(GOLANGCI_LINT) run --no-config
 
 check:
-	GOWORK=off $(GO) mod tidy -diff
+	$(HUGO) mod tidy
+	@git diff --exit-code -- go.mod go.sum || { echo "go.mod/go.sum are not tidy; run 'make tidy'"; exit 1; }
 	$(MAKE) lint
 	$(MAKE) test
