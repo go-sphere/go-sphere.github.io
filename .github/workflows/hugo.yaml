@@ -3,6 +3,11 @@ on:
   push:
     branches:
       - master
+  # PRs build the site (and run `make test`) before a merge can break master;
+  # the deploy job is skipped for them.
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
 permissions:
   contents: read
@@ -38,8 +43,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+      # Pages configuration (and its token permissions) only exists for
+      # deployments; on a pull request the site is built with a relative
+      # baseURL just to prove it compiles.
       - name: Setup Pages
         id: pages
+        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
       - name: Install Protobuf compiler
         run: |
@@ -98,10 +107,12 @@ jobs:
           path: ${{ runner.temp }}/hugo_cache
           key: ${{ steps.cache-restore.outputs.cache-primary-key }}
       - name: Upload artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
   deploy:
+    if: github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
