@@ -71,10 +71,10 @@ See [Error Handling Guide](../guides/error-handling) for implementation details.
 
 Sphere's HTTP runtime is split in two:
 
-- [`httpx`](https://github.com/go-sphere/httpx) — router/context/handler interfaces, plus adapters for Gin, Fiber, Echo, and Hertz
+- [`httpx`](https://github.com/go-sphere/httpx) — router/context/handler interfaces, a `stdx` (net/http) engine, plus adapters for Gin, Fiber, Echo, and Hertz
 - `server/httpz` — JSON envelopes plus `WithJson`, `WithSSE`, and `AbortWithJsonError` on top of `httpx`
 
-Official templates still use Gin as the default engine, but generated code talks to `httpx`, not `*gin.Context`.
+Official templates use the `stdx` adapter over plain `net/http` as the default engine, but generated code talks to `httpx`, not to a framework context type.
 
 ### Core Components
 
@@ -96,7 +96,7 @@ Official templates still use Gin as the default engine, but generated code talks
 ### Typical Request Flow
 
 1. **Protobuf + [`protoc-gen-sphere`](https://github.com/go-sphere/protoc-gen-sphere)** generate handler plumbing
-2. **Request arrives** at an `httpx` adapter (Gin by default)
+2. **Request arrives** at an `httpx` adapter (net/http `stdx` by default)
 3. **Handler binds** request data to generated structs (using sphere/binding tags)
 4. **Service method** executes business logic, returns data or a typed error
 5. **`httpz.WithJson`** writes `DataResponse` or routes the error through `AbortWithJsonError`
@@ -129,7 +129,7 @@ func _UserService_GetUser0_HTTP_Handler(srv UserServiceHTTPServer) httpx.Handler
 
 ### Extensibility
 
-- **Custom Router Types**: swap Gin for Fiber, Echo, or Hertz via `httpx` adapters and [`protoc-gen-sphere`](https://github.com/go-sphere/protoc-gen-sphere) `router_type` / `context_type` flags
+- **Custom Router Types**: swap the default net/http engine for Gin, Fiber, Echo, or Hertz via `httpx` adapters and [`protoc-gen-sphere`](https://github.com/go-sphere/protoc-gen-sphere) `router_type` / `context_type` flags
 - **Response Envelope**: override `data_resp_type` / `error_resp_type` / `server_handler_func`
 - **Streaming Wrapper**: override `stream_handler_func` / `stream_type` for generated server streams
 - **Error Parser**: `httpz.SetDefaultErrorParser` to merge validation or domain-specific errors

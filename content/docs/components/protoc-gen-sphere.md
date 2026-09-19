@@ -59,5 +59,5 @@ Notes
 - Client-streaming and bidirectional methods are skipped with a warning. On a server stream, `response_body` is ignored because each event carries the whole reply message.
 - GET, HEAD, DELETE, and OPTIONS never emit `BindJSON`. If a proto still declares `body` on those methods, the plugin warns (or fails with `fail_on_warn`) and generates the handler without a body bind.
 - Pair with [`protoc-gen-sphere-binding`](https://github.com/go-sphere/protoc-gen-sphere-binding) to inject binding tags into generated structs.
-- Official templates wrap Gin, Fiber, Echo, or Hertz behind `httpx` adapters. Changing `router_type` / `context_type` is how you retarget the generated code.
+- Official templates run on `httpx/stdx`, the plain net/http adapter; Gin, Fiber, Echo, and Hertz adapters are also available. Changing `router_type` / `context_type` is how you retarget the generated code.
 - See [Server Streaming](../guides/server-streaming) for the generated contract, wire format, and lifecycle rules.

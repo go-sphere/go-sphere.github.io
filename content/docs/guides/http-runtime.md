@@ -10,7 +10,7 @@ Generated HTTP code talks to [`httpx`](https://github.com/go-sphere/httpx), not 
 | Layer | Package | Role |
 | --- | --- | --- |
 | Router contract | `github.com/go-sphere/httpx` | `Engine`, `Router`, `Handler`, `Middleware`, `Context`, `Streamer` |
-| Adapters | `httpx/ginx`, `httpx/fiberx`, `httpx/echox`, `httpx/hertzx` | Wrap a concrete framework |
+| Adapters | `httpx/stdx`, `httpx/ginx`, `httpx/fiberx`, `httpx/echox`, `httpx/hertzx` | `stdx` is plain `net/http`; the rest wrap a concrete framework |
 | Responses | `github.com/go-sphere/sphere/server/httpz` | `WithJson`, `WithSSE`, `DataResponse`, `ErrorResponse`, `SSEStream` |
 | Middleware | `sphere/server/middleware/*` | Auth, CORS, online, rate limiter, selector |
 
@@ -69,7 +69,7 @@ GET/HEAD/DELETE/OPTIONS never call `BindJSON`, even if the proto declared `body`
 ## Streaming
 
 `httpx.Streamer` is the portable incremental-response capability implemented by
-all four official adapters. `httpx.ServerSentEvents` builds SSE framing on top
+every adapter. `httpx.ServerSentEvents` builds SSE framing on top
 of it and provides `SSEWriter.Send`, `SendData`, `SendJSON`, and `Comment`.
 Every event is flushed as one unit.
 
@@ -102,7 +102,7 @@ buffering. Push endpoints that may wait indefinitely before their first reply
 can opt into eager commit through a custom stream wrapper; see the streaming
 guide for the trade-off.
 
-Gin, Echo, and Hertz additionally implement `httpx.Flusher` for manually
+`stdx`, Gin, Echo, and Hertz additionally implement `httpx.Flusher` for manually
 flushing a response inside a handler. Fiber does not, but its `Streamer`
 implementation works through Fiber's deferred stream writer. In-process
 `httpx.TestRequester` calls buffer the final stream body, so use a real network
@@ -113,18 +113,21 @@ implementation pattern, client behavior, and deployment considerations.
 
 ## Template Wiring
 
-Official templates construct a Gin engine and wrap it:
+Official templates construct a `net/http` server and hand it to the `stdx`
+adapter:
 
 ```go
-engine := gin.New()
-app := ginx.New(
-    ginx.WithEngine(engine),
-    ginx.WithServerAddr(addr),
+s := &http.Server{Addr: addr, ReadHeaderTimeout: readHeaderTimeout}
+engine := stdx.New(
+    stdx.WithServer(s),
+    stdx.WithErrorHandler(httpz.AbortWithJsonError),
 )
-return app // httpx.Engine
+return engine // httpx.Engine
 ```
 
-Replace `ginx` with `fiberx`, `echox`, or `hertzx` without changing generated service interfaces. Keep:
+`stdx.WithAddr(addr)` does the same when a bare listen address is enough and
+you do not need to configure the server. Replace `stdx` with `ginx`, `fiberx`,
+`echox`, or `hertzx` without changing generated service interfaces. Keep:
 
 - generated `Register*HTTPServer(route httpx.Router, srv ...)`
 - binding tags from `sphere.binding`
@@ -148,8 +151,8 @@ The parser return is `(code, status, message)`.
 
 - `code` is still zeroed unless the error implements `httpx.CodeError`.
 - `message` from `httpx.MessageError` always wins when non-empty.
-- Otherwise a parser message is kept when it is **not** `err.Error()` (so joined validation text is returned, but `httpx.ParseError`'s raw-error fallback is not).
-- Adapter default error handlers use `httpx.RenderError` (status + `{success, code, message}`, no `error` field). Official templates install `httpz.AbortWithJsonError` as the gin error handler so middleware failures use the same envelope as `WithJson`.
+- Otherwise a non-empty parser message is used, falling back to the generic status text only when it is empty. Joined validation text comes back this way; `httpx.ParseError` returns an empty message for unclassified errors, so raw `err.Error()` strings never reach the client.
+- Adapter default error handlers use `httpx.RenderError` (status + `{success, code, message}`, no `error` field). Official templates install `httpz.AbortWithJsonError` through `stdx.WithErrorHandler` so middleware failures use the same envelope as `WithJson`.
 
 `NewXxxError(msg)` / `NewWithStatus(status, msg)` put `msg` in `GetMessage()`. `XxxError(err)` without extra arguments still has an empty user message and becomes the generic status text. Bind failures are wrapped as `httpx.BadRequestError` in every adapter.
 

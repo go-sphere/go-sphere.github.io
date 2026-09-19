@@ -62,7 +62,7 @@ Sphere uses these definitions to automatically generate server-side stubs and ro
 
 ## URL Path Mapping
 
-Sphere converts gRPC-Gateway style URL paths from your `.proto` definitions into `httpx` routes (`:param` and `*wildcard`). Official templates serve those routes through a Gin adapter; Fiber, Echo, and Hertz adapters accept the same patterns.
+Sphere converts gRPC-Gateway style URL paths from your `.proto` definitions into `httpx` routes (`:param` and `*wildcard`). Official templates serve those routes through the `stdx` net/http adapter; Gin, Fiber, Echo, and Hertz adapters accept the same patterns.
 
 The following table shows how Protobuf URL paths are translated:
 

@@ -8,7 +8,7 @@ Sphere is a thin integration layer for Protobuf-first Go services. It gives you 
 What you build:
 - Define entities with Ent and APIs with Protobuf
 - Generate Go handlers, Swagger, error types, and client SDKs
-- Compose services with `httpx` (Gin adapter by default) + Wire; run and build through the project Makefile
+- Compose services with `httpx` (net/http `stdx` adapter by default) + Wire; run and build through the project Makefile
 
 ## Prerequisites
 

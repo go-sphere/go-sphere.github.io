@@ -9,7 +9,7 @@ Sphere templates ship with a complete default stack, but the framework is not de
 
 ### HTTP Router
 
-The default generated HTTP code targets `httpx`. Official templates wrap Gin (or Fiber, Echo, Hertz) behind an adapter. When replacing the router, preserve:
+The default generated HTTP code targets `httpx`. Official templates wrap plain net/http through `stdx`; Gin, Fiber, Echo, and Hertz adapters are also available. When replacing the router, preserve:
 
 - generated service interfaces;
 - request binding semantics from `sphere.binding`;

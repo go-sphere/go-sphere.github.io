@@ -149,7 +149,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *CreateUserRequest) (*
 }
 ```
 
-Keep logging in the service layer. Generated HTTP handlers already go through `httpz`; they do not need per-request `*gin.Context` log calls.
+Keep logging in the service layer. Generated HTTP handlers already go through `httpz`; they do not need per-request `httpx.Context` log calls.
 
 ## Best Practices
 

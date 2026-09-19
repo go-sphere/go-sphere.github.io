@@ -37,7 +37,7 @@ layout: hextra-home
   >}}
   {{< hextra/feature-card
     title="Replaceable Defaults"
-    subtitle="Official templates pick Gin, Ent or Bun, Wire, Buf, and Swagger, but those choices remain visible and replaceable."
+    subtitle="Official templates pick net/http, Ent or Bun, Wire, Buf, and Swagger, but those choices remain visible and replaceable."
     link="docs/concepts/philosophy"
   >}}
   {{< hextra/feature-card

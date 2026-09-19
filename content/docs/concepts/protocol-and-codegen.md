@@ -52,7 +52,7 @@ From your proto definitions, you automatically get:
 **Server-side Code:**
 - Service interfaces to implement
 - `httpx` HTTP handlers and route registration
-- Request binding with validation (`BindJSON` / `BindQuery` / `BindURI` / …)
+- Request binding (`BindJSON` / `BindQuery` / `BindURI` / …), with `protovalidate` validation emitted on top by `protoc-gen-sphere`
 - `httpz` JSON envelopes for unary methods
 - `httpz` SSE producers for `returns (stream Reply)` methods
 - Error handling with consistent formatting
