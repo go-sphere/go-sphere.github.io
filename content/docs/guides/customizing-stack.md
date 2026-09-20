@@ -59,4 +59,4 @@ Sphere does not own deployment orchestration. Templates can provide Docker targe
 
 If a customization keeps those contracts intact, it is aligned with Sphere's design.
 
-See [HTTP Runtime](http-runtime) for adapter wiring and [Upgrading to v0.0.4](upgrading) for the runtime API break.
+See [HTTP Runtime](http-runtime) for adapter wiring.

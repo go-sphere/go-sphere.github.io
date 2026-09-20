@@ -162,4 +162,3 @@ The parser return is `(code, status, message)`.
 - [Server Streaming](server-streaming)
 - [Error Handling](error-handling)
 - [Customizing the Stack](customizing-stack)
-- [Upgrading to v0.0.4](upgrading)

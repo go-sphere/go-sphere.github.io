@@ -48,6 +48,5 @@ Every driver runs `storage.NormalizeKey` first. Persist the key `UploadFile` ret
 
 ## Related
 
-- [Upgrading to v0.0.4](upgrading) — TTL, `Close` ownership, and boot timeout changes
 - [Customizing the Stack](customizing-stack)
 - [Logging](logging)

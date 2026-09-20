@@ -15,5 +15,4 @@ Hands-on topics and best practices.
   {{< card link="error-handling" title="Error Handling" icon="variable" >}}
   {{< card link="logging" title="Logging" icon="document-text" >}}
   {{< card link="infrastructure" title="Cache, Storage, Boot" icon="chart-square-bar" >}}
-  {{< card link="upgrading" title="Upgrading to v0.0.4" icon="sparkles" >}}
 {{< /cards >}}

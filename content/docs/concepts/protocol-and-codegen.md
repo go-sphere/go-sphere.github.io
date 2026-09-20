@@ -139,4 +139,3 @@ For detailed information on:
 - **Server streaming**: See [Server Streaming](../guides/server-streaming)
 - **Error handling**: See [Error Handling](../guides/error-handling)
 - **Proto packages**: See [Proto Packages & Runtime](proto-packages-and-runtime)
-- **Upgrading**: See [Upgrading to v0.0.4](../guides/upgrading)

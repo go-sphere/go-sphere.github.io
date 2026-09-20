@@ -175,4 +175,3 @@ File rotation is configured on `zapx.Config.File`. For development, [Logdy](http
 ## Related
 
 - [HTTP Runtime](http-runtime) — how `httpz` logs panics without leaking them to clients
-- [Upgrading to v0.0.4](upgrading) — logger init and `WithStackAt` behavior changes
