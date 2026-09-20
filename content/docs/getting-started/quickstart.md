@@ -12,7 +12,7 @@ What you build:
 
 ## Prerequisites
 
-- Go 1.25+
+- Go 1.26+
 - Docker + Docker Compose  (Optional)
 - Node.js + npm (for TypeScript clients)
 

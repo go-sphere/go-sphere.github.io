@@ -19,6 +19,7 @@ err := boot.Run(conf, func(c *Conf) (*boot.Application, error) {
 - Members of a plain `NewApplication` stop concurrently. Use `NewStagedApplication` when one task's `Stop` tears down something another task still uses (last stage stops first).
 - Close Wire-owned clients (`sql.DB`, Redis) in `AddAfterStop` or in the injector cleanup after `Run` returns.
 - Constructors such as `infra/redis.NewClient` do not ping. Add `AddBeforeStart` if startup must fail when the backend is down.
+- `task.NewFunc(id, onStart, onStop)` builds a `task.Task` from callbacks for one-off jobs, instead of a dedicated type. A nil callback is a no-op, `Stop` runs `onStop` on every call (make it idempotent), and it does not cancel `Start`'s context — the group does.
 
 ## Cache
 

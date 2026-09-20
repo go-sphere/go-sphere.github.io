@@ -31,7 +31,7 @@ The behavior of [`protoc-gen-sphere-binding`](https://github.com/go-sphere/proto
 - **`version`**: Print the current plugin version and exit. (Default: `false`)
 - **`out`**: The output directory for the modified `.pb.go` files. (Default: `api`)
 - **`auto_remove_json`**: Automatically remove json tag when sphere binding location is set. (Default: `true`)
-- **`binding_aliases`**: Add additional tag aliases for any binding tag. Format: `tag1=alias1,tag2=alias2`. Example: `query=form,uri=path,db=database`. (Default: `""`)
+- **`binding_aliases`**: Add additional tag aliases for a binding tag. Format: `tag1=alias1,tag2=alias2`. Example: `query=form,uri=path`. Only the four binding tags `query`, `uri`, `form` and `header` can be aliased; entries for any other key are ignored. (Default: `""`)
 
 ## Usage with Buf
 
@@ -67,6 +67,9 @@ The plugin supports the following binding locations through the `sphere.binding.
 - `BINDING_LOCATION_URI`: Fields bound to URI path parameters (adds `uri` tag, removes `json` tag)
 - `BINDING_LOCATION_HEADER`: Fields bound to HTTP headers (adds `header` tag, removes `json` tag)
 - `BINDING_LOCATION_FORM`: Fields bound to form data (adds `form` tag, removes `json` tag)
+- `BINDING_LOCATION_UNSPECIFIED`: Not set explicitly; the field inherits the message-level `default_location`
+
+`QUERY`, `URI` and `HEADER` decode from a single string token, so they are valid only on scalar fields (plus the well-known scalar wrappers `Timestamp`, `Duration` and `wrapperspb.*Value`). Annotating a `map`, `bytes` or arbitrary `message` field with one of these locations is a generation-time error. `JSON` and `FORM` accept any type; `FORM` can also carry `bytes`/files.
 
 ## Proto Definition Example
 
@@ -102,7 +105,7 @@ message RunTestRequest {
   // Custom tags
   repeated int32 ids = 9 [
     (sphere.binding.location) = BINDING_LOCATION_QUERY,
-    (sphere.binding.auto_tags) = "custom:\"ids\""
+    (sphere.binding.tags) = "custom:\"ids\""
   ];
 }
 
@@ -180,6 +183,8 @@ Nested message type definitions do not inherit `default_location` from the enclo
 
 `protoc-gen-go` emits each oneof member on a wrapper struct (`Message_Field`). The binding plugin tags those wrappers, not the parent message field.
 
+`default_oneof_location` / `default_oneof_auto_tags` are set on the oneof itself and apply to every member; an explicit `(sphere.binding.location)` on a member still wins, and an unset oneof location falls back to the enclosing message's `default_location`. Proto3 `optional` fields are backed by a synthetic oneof — they are treated as ordinary fields and use their own `location` / `default_location`, not the oneof options.
+
 Generated HTTP handlers bind the parent request. `httpx` binders do not follow oneof wrappers, so QUERY/URI/HEADER oneof members are not populated at runtime. Prefer dedicated request messages for HTTP APIs.
 
 ```protobuf
@@ -198,14 +203,14 @@ JSON codecs also handle oneof awkwardly on the wire.
 
 ### Custom Tags
 
-Add custom Go struct tags using the `auto_tags` annotation:
+Add custom Go struct tags with two field annotations: `auto_tags` takes bare tag keys whose value is the field's proto name, while `tags` takes complete `key:"value"` strings.
 
 ```protobuf
 message DatabaseModel {
   option (sphere.binding.default_auto_tags) = "db";
   
   string name = 1;     // Generated: `db:"name" json:"name"`
-  string email = 2 [(sphere.binding.auto_tags) = "validate:\"email\""];
+  string email = 2 [(sphere.binding.tags) = "validate:\"email\""];
   // Generated: `db:"email" json:"email" validate:"email"`
 }
 ```

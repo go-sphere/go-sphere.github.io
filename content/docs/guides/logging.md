@@ -151,6 +151,21 @@ func (s *UserService) CreateUser(ctx context.Context, req *CreateUserRequest) (*
 
 Keep logging in the service layer. Generated HTTP handlers already go through `httpz`; they do not need per-request `httpx.Context` log calls.
 
+## HTTP Request Logging
+
+`sphere/server/middleware/logger` provides two `httpx` middleware layers over any `log.BaseLogger`:
+
+- `logger.Log(lg)` writes one access entry after the downstream chain — Info when it succeeds, Error (returning the chain error) when it fails. Entries include status, method, path, query, client IP, user-agent, and latency.
+- `logger.RecoveryLog(lg, stack)` recovers a panic, logs it at Error (with a stack when `stack` is true), and finishes the request as HTTP 500.
+
+Register both at engine scope so they also cover paths no route matched:
+
+```go
+engine.Use(logger.Log(lg), logger.RecoveryLog(lg, true))
+```
+
+`RecoveryLog` returns nil after recovering on purpose — returning the error would let an enclosing layer write a second response over the committed one — so it must be the innermost recovery layer. With the order above the panic is still logged with its stack by `RecoveryLog`, while the outer `Log` records the request at Info with `status=500`; the level alone does not reveal a recovered panic.
+
 ## Best Practices
 
 - Use structured fields instead of `fmt.Sprintf` in the message
@@ -171,6 +186,17 @@ log.Info(fmt.Sprintf("User %s logged in from %s", userID, clientIP))
 ## Log Collection
 
 File rotation is configured on `zapx.Config.File`. For development, [Logdy](https://github.com/logdyhq/logdy-core) can tail the file. For production, ship the JSON file with Promtail / Loki or any other collector; Sphere does not own that pipeline.
+
+## In-Memory Log Tail
+
+`sphere/log/logbuffer` is a `log.Backend` that retains the last N entries in a ring with monotonically increasing sequence numbers and fans them out to subscribers. Register it alongside the output backends:
+
+```go
+logs := logbuffer.New(1024)
+log.InitWithBackends(zapx.NewBackend(conf.Log), logs)
+```
+
+`Buffer.Subscribe` returns the backfill after a cursor atomically with the live channel, so there is no gap between history and live delivery; `History` reads older entries. A cursor that fell out of the ring (`Truncated`) or entries dropped for a slow subscriber (`Dropped`) are reported explicitly instead of being lost silently. Sequence numbers restart at 1 on process restart, so pair a resume cursor with `Buffer.ID()` and treat a changed ID as a reset. The standard layout uses it for the dashboard log tail.
 
 ## Related
 

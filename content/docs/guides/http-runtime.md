@@ -133,6 +133,38 @@ you do not need to configure the server. Replace `stdx` with `ginx`, `fiberx`,
 - binding tags from `sphere.binding`
 - `httpz` envelopes, unless you override the generator flags
 
+## Middleware
+
+There is one middleware form: a layer receives the rest of the chain and returns what runs in its place. `Use` registers it on an engine, a group, or a router.
+
+```go
+type Middleware func(next httpx.Handler) httpx.Handler
+
+func RequestID(next httpx.Handler) httpx.Handler {
+    return func(ctx httpx.Context) error {
+        ctx.SetContext(withRequestID(ctx.Context()))
+        return next(ctx)
+    }
+}
+```
+
+Returning without calling `next` stops the chain (there is no `Abort` bookkeeping), and an error returned by `next` is rendered at the route where the chain was composed — a layer that logs or measures the outcome should read that error, not only `ctx.StatusCode()`.
+
+Where a layer runs:
+
+- A route's chain is resolved when the route is registered. A late `engine.Use` reaches the routes an existing group registers afterwards; routes already registered keep the chain they were registered with.
+- `Use` layers always run inside anything mounted with the adapter's `UseNative` (`ginx`, `echox`, `fiberx`, `hertzx`), whatever the registration order. `stdx` has no `UseNative`, because net/http has no native middleware type beyond the one `AdaptStdMiddleware` already takes.
+- An engine-scope chain also covers paths no route matched (404/405), so access logging, panic recovery, and CORS see them; a group's chain never does, because a 404 belongs to no group.
+- `ctx.SetContext` values set below stay visible to the layers above after `next` returns.
+
+Official templates register the shared logger layers at engine scope (`internal/pkg/httpsrv/httpsrv.go`):
+
+```go
+engine.Use(logger.Log(lg), logger.RecoveryLog(lg, true))
+```
+
+`sphere/server/middleware` ships the same shape for auth, CORS, online tracking, rate limiting, selector, and logger. See [Logging](logging) for the logger layer's composition rules and [Upgrading to v0.0.5 / v0.0.6](upgrading) if you are migrating middleware written against the old `func(httpx.Context) error` form.
+
 ## Custom Error Parser
 
 Templates install a parser that maps protovalidate and Ent errors before falling back to `httpx.ParseError`:
@@ -162,3 +194,4 @@ The parser return is `(code, status, message)`.
 - [Server Streaming](server-streaming)
 - [Error Handling](error-handling)
 - [Customizing the Stack](customizing-stack)
+- [Upgrading to v0.0.5 / v0.0.6](upgrading)

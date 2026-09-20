@@ -15,6 +15,16 @@ To install `sphere-cli`, ensure you have Go installed and run the following comm
 go install github.com/go-sphere/sphere-cli@latest
 ```
 
+## Interactive Mode
+
+When a command is run **without its required flags and both stdin/stdout are terminals**, `sphere-cli` launches an interactive wizard:
+
+- `sphere-cli create` walks through template selection (fetched from the remote catalog, with a built-in fallback), the project name, the Go module path, and optional steps (git init, dependency installation).
+- `sphere-cli service proto` / `service golang` list the Ent schemas detected in the current project so the entity can be picked instead of typed, offer package/module defaults (module read from `go.mod`), show a preview of the generated code, and let you choose between printing to stdout and writing to a suggested path.
+- `sphere-cli rename` reads the current module from `go.mod` so only the new module path has to be entered, then confirms before rewriting imports.
+
+All commands keep their flags for scripted use. When stdout is not a terminal (CI, pipes), the wizards are skipped automatically and the required flags apply.
+
 ## Usage
 
 The general syntax for `sphere-cli` is:
@@ -57,13 +67,15 @@ Initializes a new Sphere project with a default template.
 
 **Usage:**
 ```shell
-sphere-cli create --name <project-name> [--module <go-module-name>] [--layout <layout-name-or-uri>]
+sphere-cli create --name <project-name> [--module <go-module-name>] [--layout <layout-name-or-uri>] [--no-git] [--no-deps]
 ```
 
 **Flags:**
-- `--name string`: (Required) The name for the new Sphere project.
-- `--module string`: (Optional) The Go module path for the project.
+- `--name string`: Required in scripted mode. The name for the new Sphere project.
+- `--module string`: (Optional) The Go module path for the project. Defaults to the project name when omitted.
 - `--layout string`: (Optional) Official layout name or custom layout JSON URI.
+- `--no-git`: Skip git repository initialization and the initial commit.
+- `--no-deps`: Skip dependency installation (`make init` + `go mod tidy`).
 
 Official layout names are `standard` (the default), `simple`, `bun`, and
 `telegram`. Official and custom Git-backed layouts define `source`, `ref`, and
@@ -88,6 +100,14 @@ After creation, initialize and run the project through `make`:
 cd myproject
 make init
 make run
+```
+
+### `create list`
+
+Lists the available project templates.
+
+```shell
+sphere-cli create list
 ```
 
 ### Updating a generated project
@@ -125,12 +145,15 @@ Generates a `.proto` file for a new service.
 
 **Usage:**
 ```shell
-sphere-cli service proto --name <service-name> [--package <package-name>]
+sphere-cli service proto [--name <service-name>] [--package <package-name>] [--out <file>]
 ```
 
 **Flags:**
-- `--name string`: (Required) The name of the service.
+- `--name string`: Required in scripted mode. The name of the service.
 - `--package string`: The package name for the generated `.proto` file (default: `dash.v1`).
+- `--out string`: Write the generated code to this file instead of stdout.
+
+The generated proto references `entpb.<Entity>` messages, so the entity must already exist as an Ent schema and be annotated for `entproto` generation. Run the command inside the project so `--name` is matched against the real schema types.
 
 **Example:**
 ```shell
@@ -143,13 +166,16 @@ Generates the Go implementation for a service from its definition.
 
 **Usage:**
 ```shell
-sphere-cli service golang --name <service-name> [--package <package-name>] [--mod <go-module-path>]
+sphere-cli service golang [--name <service-name>] [--package <package-name>] [--mod <go-module-path>] [--out <file>]
 ```
 
 **Flags:**
-- `--name string`: (Required) The name of the service.
+- `--name string`: Required in scripted mode. The name of the service.
 - `--package string`: The package name for the generated Go code (default: `dash.v1`).
 - `--mod string`: The Go module path for the generated code (default: `github.com/go-sphere/sphere-layout`).
+- `--out string`: Write the generated code to this file instead of stdout.
+
+The generated skeleton calls APIs produced by the project's own generators (`entbind.CreateXxx`, `ent.Xxx.Create`, `s.render.Xxx`), so the entity must exist as an Ent schema and `make gen/proto` must have run at least once. Run the command inside the project directory so the name is matched against the real schema types; outside a project, pass multi-word entities in separated form (`key_value_store`).
 
 **Example:**
 ```shell
@@ -162,8 +188,13 @@ Renames the Go module path across the entire repository. This is useful when you
 
 **Usage:**
 ```shell
-sphere-cli rename --old <old-module-path> --new <new-module-path>
+sphere-cli rename [--old <old-module-path>] --new <new-module-path> [--target <directory>]
 ```
+
+**Flags:**
+- `--old string`: Current Go module path. Optional: detected from `go.mod` in the target directory when omitted.
+- `--new string`: (Required) The new Go module path.
+- `--target string`: Root directory of the project to rename (default: `.`).
 
 ## Common Workflows
 
