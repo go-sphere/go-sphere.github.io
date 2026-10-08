@@ -167,7 +167,7 @@ engine.Use(logger.Log(lg), logger.RecoveryLog(lg, true))
 
 ## Custom Error Parser
 
-Templates install a parser that maps protovalidate and Ent errors before falling back to `httpx.ParseError`:
+The default parser is `httpz.ParseError`: `httpx.ParseError` plus the status of storage sentinels, which carry none of their own (`storageerr.ErrNotFound` → 404, `storageerr.ErrDestExists` / `storageerr.ErrFileNameInvalid` → 400; an `httpx.StatusError` in the chain still wins). Templates install a parser that maps protovalidate and Ent errors first. A parser set with `httpz.SetDefaultErrorParser` replaces the default entirely, so it must fall back to `httpz.ParseError`, not `httpx.ParseError` — otherwise a missing storage key renders as 500:
 
 ```go
 httpz.SetDefaultErrorParser(func(err error) (int32, int32, string) {
@@ -175,7 +175,7 @@ httpz.SetDefaultErrorParser(func(err error) (int32, int32, string) {
     if errors.As(err, &ve) {
         return 0, 400, /* joined violation messages */
     }
-    return httpx.ParseError(err)
+    return httpz.ParseError(err)
 })
 ```
 
@@ -183,7 +183,7 @@ The parser return is `(code, status, message)`.
 
 - `code` is still zeroed unless the error implements `httpx.CodeError`.
 - `message` from `httpx.MessageError` always wins when non-empty.
-- Otherwise a non-empty parser message is used, falling back to the generic status text only when it is empty. Joined validation text comes back this way; `httpx.ParseError` returns an empty message for unclassified errors, so raw `err.Error()` strings never reach the client.
+- Otherwise a non-empty parser message is used, falling back to the generic status text only when it is empty. Joined validation text comes back this way; `httpz.ParseError` returns an empty message for unclassified errors, so raw `err.Error()` strings never reach the client.
 - Adapter default error handlers use `httpx.RenderError` (status + `{success, code, message}`, no `error` field). Official templates install `httpz.AbortWithJsonError` through `stdx.WithErrorHandler` so middleware failures use the same envelope as `WithJson`.
 
 `NewXxxError(msg)` / `NewWithStatus(status, msg)` put `msg` in `GetMessage()`. `XxxError(err)` without extra arguments still has an empty user message and becomes the generic status text. Bind failures are wrapped as `httpx.BadRequestError` in every adapter.

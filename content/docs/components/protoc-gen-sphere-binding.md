@@ -183,9 +183,9 @@ Nested message type definitions do not inherit `default_location` from the enclo
 
 `protoc-gen-go` emits each oneof member on a wrapper struct (`Message_Field`). The binding plugin tags those wrappers, not the parent message field.
 
-`default_oneof_location` / `default_oneof_auto_tags` are set on the oneof itself and apply to every member; an explicit `(sphere.binding.location)` on a member still wins, and an unset oneof location falls back to the enclosing message's `default_location`. Proto3 `optional` fields are backed by a synthetic oneof — they are treated as ordinary fields and use their own `location` / `default_location`, not the oneof options.
+`default_oneof_location` / `default_oneof_auto_tags` are set on the oneof itself and apply to every member; an explicit `(sphere.binding.location)` on a member still wins. A oneof does not inherit the enclosing message's `default_location`: without `default_oneof_location` or a member `location`, its members stay in the JSON body. The message's `default_auto_tags` still apply to oneof members unless the oneof sets `default_oneof_auto_tags`. Proto3 `optional` fields are backed by a synthetic oneof — they are treated as ordinary fields and use their own `location` / `default_location`, not the oneof options.
 
-Generated HTTP handlers bind the parent request. `httpx` binders do not follow oneof wrappers, so QUERY/URI/HEADER oneof members are not populated at runtime. Prefer dedicated request messages for HTTP APIs.
+Generated HTTP handlers bind the parent request. `httpx` binders do not follow oneof wrappers, so QUERY/URI/HEADER oneof members are not populated at runtime, and `protoc-gen-sphere` warns when a request's oneof or oneof member declares a non-JSON location. Prefer dedicated request messages for HTTP APIs.
 
 ```protobuf
 message TestRequest {

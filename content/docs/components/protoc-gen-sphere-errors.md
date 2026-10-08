@@ -11,7 +11,7 @@ This code is inspired by [`protoc-gen-go-errors`](https://github.com/go-kratos/k
 
 - Generates helpers with HTTP status codes, application codes, and messages
 - Uses `reason` in `Error()` when set; otherwise uses the enum value name
-- Provides `Join` and `JoinWithMessage` methods for error composition via `httpx.NewError`
+- Provides `Join` and `JoinWithMessage` methods for error composition via the `new_errors_func` constructor
 - Supports default status codes for enum types
 - Deduplicates `allow_alias` enum values so generated switches compile
 - Skips the zero-value `*_UNSPECIFIED` entry as a returned business error in generated helpers
@@ -19,7 +19,7 @@ This code is inspired by [`protoc-gen-go-errors`](https://github.com/go-kratos/k
 ## Configuration Parameters
 
 - **`version`**: Print the plugin version and exit. (Default: `false`)
-- **`new_errors_func`**: Constructor used by `Join` / `JoinWithMessage`. Format: `import/path;Ident`. (Default: `github.com/go-sphere/httpx;NewError`)
+- **`new_errors_func`**: Constructor used by `Join` / `JoinWithMessage`. Format: `import/path;Ident`. The function must take `(status, code int32, message string, err error)` and return a value assignable to `error`, because the generated methods return its result directly. (Default: `github.com/go-sphere/errors/sphere/errors;NewError`, so generated code does not import an HTTP adapter; set `github.com/go-sphere/httpx;NewError` to use the httpx constructor instead.)
 - **`template_file`**: Path to a custom Go template. Empty uses the embedded default.
 
 ## Installation
@@ -117,7 +117,7 @@ The plugin generates Go code with the following methods for each error enum:
 - `GetCode() int32` — the numeric enum value (e.g. `1001`)
 - `GetStatus() int32` — the HTTP status code
 - `GetMessage() string` — the user-facing default message
-- `Join(errs ...error) error` — wraps causes with `httpx.NewError`
+- `Join(errs ...error) error` — wraps causes with the `new_errors_func` constructor
 - `JoinWithMessage(msg string, errs ...error) error` — same, with a runtime message
 
 There is no generated `GetReason()` method. `reason` is only used as the `Error()` string. The enum itself implements `httpx.StatusError`, `httpx.CodeError`, and `httpx.MessageError`, so returning it directly from a service method is valid.

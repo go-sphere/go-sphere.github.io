@@ -31,6 +31,30 @@ func TestContentDocsDoNotUseGitHubAPIRepoLinks(t *testing.T) {
 	})
 }
 
+// staleAPIPatterns are spellings of APIs that were removed or whose use is now
+// wrong at the current sphere / plugin HEAD. Only the upgrading guide may name
+// them, because it tells readers what to replace them with.
+var staleAPIPatterns = []string{
+	"WithLoggerInit",                                 // removed from sphere/core/boot
+	"return httpx.ParseError(",                       // custom parsers must fall back to httpz.ParseError
+	"default `httpx.ParseError` fallback",            // same
+	"Default: `github.com/go-sphere/httpx;NewError`", // protoc-gen-sphere-errors default changed
+	"unset oneof location falls back",                // oneofs no longer inherit default_location
+}
+
+func TestContentDocsDoNotUseStaleAPIs(t *testing.T) {
+	walkMarkdown(t, "content", func(path, text string) {
+		if filepath.Base(path) == "upgrading.md" {
+			return
+		}
+		for _, pattern := range staleAPIPatterns {
+			if strings.Contains(text, pattern) {
+				t.Errorf("%s references stale API %q", path, pattern)
+			}
+		}
+	})
+}
+
 func TestContentDocsUseKnownBindingLocations(t *testing.T) {
 	walkMarkdown(t, "content", func(path, text string) {
 		for _, token := range bindingLocationRE.FindAllString(text, -1) {

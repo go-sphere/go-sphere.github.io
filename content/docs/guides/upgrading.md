@@ -139,6 +139,24 @@ engine := stdx.New(
 engine.Use(logger.Log(lg), logger.RecoveryLog(lg, true))
 ```
 
+## Next release: sphere v0.0.7 (unreleased)
+
+`sphere` v0.0.7 is not tagged yet; this section tracks the breaking changes already on its default branch so the upgrade can be planned. Most of them compile cleanly and only change runtime behaviour. The authoritative list is the "Unreleased (v0.0.7)" section of `sphere/CHANGELOG.md`.
+
+| Change | What to write instead |
+| --- | --- |
+| Importing `core/boot` no longer sets `time.Local` / `TZ` to `Asia/Shanghai`; without a call the process runs in the host zone (UTC in most images), which shifts log timestamps and cron/asynq schedules with an empty `Timezone`. | Call `boot.InitTimezone(boot.DefaultTimezone)` first thing in `main`. |
+| `idgenerator` no longer reads `WORKER_ID` in package init; the first `NextId` does, and a malformed value panics there instead of at startup. | Call `idgenerator.InitFromEnv()` (or `idgenerator.Init(workerID)`) in `main` and fail on its error. |
+| `boot.WithLoggerInit` is removed. | `boot.WithLoggerBackend(zapx.NewBackend(conf.Log, ...))` — see [Logging](logging). |
+| `storageerr.ErrNotFound`, `ErrDestExists`, `ErrFileNameInvalid` no longer carry an HTTP status. The default parser `httpz.ParseError` maps them to 404/400, but a custom parser that falls back to `httpx.ParseError` renders them as 500. | Fall back to `httpz.ParseError` — see [Custom Error Parser](http-runtime#custom-error-parser). |
+| `jwtauth.ParseToken` rejects tokens without `exp` (`jwt.ErrTokenRequiredClaimMissing`). | Set `ExpiresAt` on custom claims; `NewRBACClaims` already does. |
+| `fileserver` stores upload tokens under a `sphere-upload-token:` prefix, so tokens issued before the upgrade stop working; `WithCreateFileKey` now takes `func(ctx context.Context) (string, error)` and only generates the token. | Re-issue pending upload tokens; return just the token from a custom `WithCreateFileKey`. |
+
+The protoc plugins on their default branches also change generated output:
+
+- `protoc-gen-sphere-errors` defaults `new_errors_func` to `github.com/go-sphere/errors/sphere/errors;NewError`, so generated errors no longer import `httpx`. Set `new_errors_func=github.com/go-sphere/httpx;NewError` to keep the old constructor. See [protoc-gen-sphere-errors](../components/protoc-gen-sphere-errors).
+- `protoc-gen-sphere-binding` no longer applies a message's `default_location` to its oneof members; they stay in the JSON body unless the oneof sets `default_oneof_location`. See [protoc-gen-sphere-binding](../components/protoc-gen-sphere-binding#oneof-support).
+
 ## Related
 
 - [HTTP Runtime](http-runtime) — the current middleware and adapter contracts

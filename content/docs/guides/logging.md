@@ -58,7 +58,7 @@ func main() {
 
 `WithLoggerBackend` installs the backend before start and syncs it after stop. If the backend implements `SlogLogger`, it also becomes the default `log/slog` handler.
 
-`boot.WithLoggerInit(version, conf.Log)` still exists as a deprecated wrapper around the same path. New code should construct the backend explicitly.
+`WithLoggerBackend` is the only logger option on `boot`; construct the backend explicitly as above.
 
 To install the logger without boot:
 
