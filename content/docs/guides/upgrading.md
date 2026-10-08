@@ -129,7 +129,7 @@ New in v0.0.6, not migration work: eager-commit SSE streams (`httpz.WithSSEEager
 
 ## Templates and stdx
 
-Official templates (`sphere-layout`, `sphere-simple-layout`, `sphere-bun-layout`, `sphere-telegram-layout`) now depend on `sphere` v0.0.6 and `httpx/stdx` v0.0.5, and already apply every change above. Existing projects created from older templates still need this page. A template registers its engine like this:
+Official templates (`sphere-layout`, `sphere-simple-layout`, `sphere-bun-layout`, `sphere-telegram-layout`) now depend on `sphere` v0.0.7, `httpx/stdx` v0.0.6 and `errors` v0.0.3, and already apply every change above — including `idgenerator.InitFromEnv`, the `httpz.ParseError` fallback and the engine-level body cap. Existing projects created from older templates still need this page. A template registers its engine like this:
 
 ```go
 engine := stdx.New(
@@ -139,9 +139,9 @@ engine := stdx.New(
 engine.Use(logger.Log(lg), logger.RecoveryLog(lg, true))
 ```
 
-## Next release: sphere v0.0.7 (unreleased)
+## sphere v0.0.7
 
-`sphere` v0.0.7 is not tagged yet; this section tracks the breaking changes already on its default branch so the upgrade can be planned. Most of them compile cleanly and only change runtime behaviour. The authoritative list is the "Unreleased (v0.0.7)" section of `sphere/CHANGELOG.md`.
+`sphere` v0.0.7 was released on 2026-10-08 with `httpx` v0.0.6. Most of its breaking changes compile cleanly and only change runtime behaviour. The authoritative list is the v0.0.7 section of `sphere/CHANGELOG.md`.
 
 | Change | What to write instead |
 | --- | --- |
@@ -152,10 +152,26 @@ engine.Use(logger.Log(lg), logger.RecoveryLog(lg, true))
 | `jwtauth.ParseToken` rejects tokens without `exp` (`jwt.ErrTokenRequiredClaimMissing`). | Set `ExpiresAt` on custom claims; `NewRBACClaims` already does. |
 | `fileserver` stores upload tokens under a `sphere-upload-token:` prefix, so tokens issued before the upgrade stop working; `WithCreateFileKey` now takes `func(ctx context.Context) (string, error)` and only generates the token. | Re-issue pending upload tokens; return just the token from a custom `WithCreateFileKey`. |
 
-The protoc plugins on their default branches also change generated output:
+The protoc plugins released in this batch (`protoc-gen-sphere` v0.0.6, `protoc-gen-sphere-binding` v0.0.6, `protoc-gen-sphere-errors` v0.0.4) also change generated output:
 
-- `protoc-gen-sphere-errors` defaults `new_errors_func` to `github.com/go-sphere/errors/sphere/errors;NewError`, so generated errors no longer import `httpx`. Set `new_errors_func=github.com/go-sphere/httpx;NewError` to keep the old constructor. See [protoc-gen-sphere-errors](../components/protoc-gen-sphere-errors).
-- `protoc-gen-sphere-binding` no longer applies a message's `default_location` to its oneof members; they stay in the JSON body unless the oneof sets `default_oneof_location`. See [protoc-gen-sphere-binding](../components/protoc-gen-sphere-binding#oneof-support).
+- `protoc-gen-sphere` now fails generation instead of emitting code that silently drops values: a request message whose JSON body contains a real `oneof`, a `Timestamp`/`Duration`/wrapper used as a query/uri/header parameter, a FORM field on a method without a body, and nested or missing `body`/`response_body` paths. Validation errors are rendered as 400 instead of 500, and a `body: "*"` request whose message has no JSON fields no longer binds a body. See [protoc-gen-sphere](../components/protoc-gen-sphere).
+- `protoc-gen-sphere-errors` defaults `new_errors_func` to `github.com/go-sphere/errors/sphere/errors;NewError`, so generated errors no longer import `httpx` and the project needs `errors` v0.0.3 or newer. Set `new_errors_func=github.com/go-sphere/httpx;NewError` to keep the old constructor. See [protoc-gen-sphere-errors](../components/protoc-gen-sphere-errors).
+- `protoc-gen-sphere-binding` no longer applies a message's `default_location` to its oneof members; they stay in the JSON body unless the oneof sets `default_oneof_location`. It also no longer treats the well-known types as bindable scalars for query/uri/header. See [protoc-gen-sphere-binding](../components/protoc-gen-sphere-binding#oneof-support).
+
+## httpx v0.0.6
+
+`httpx` v0.0.6 (with the adapter tags `ginx/v0.0.6`, `fiberx/v0.0.6`, `echox/v0.0.6`, `hertzx/v0.0.6`, `stdx/v0.0.6`) is breaking for `fiberx` and for third-party adapters:
+
+| Change | What to write instead |
+| --- | --- |
+| A `fiberx` engine built by the adapter now routes like `stdx`: case sensitive, strict about a trailing slash, and a GET route no longer answers HEAD (`Allow` no longer lists it). | An app passed through `WithEngine` keeps its own settings; otherwise fix the routes or links that relied on the loose matching. |
+| `fiberx` route precedence no longer depends on registration order: `/users/new` beats `/users/:id`, and a parameter beats a wildcard. A route that would have to move across a native middleware whose path could match it panics at registration. | Register the native middleware before the routes it wraps, as before. |
+| Third-party adapters run through `httpxtest` must meet the new cases: `BodyLimit` requires wiring `Options.MaxBodySize` to your own limit; the routing, `File` and `Redirect` cases pin the behaviour below. `Caps.RawPathRouting` declares an engine that matches the still-encoded path. | Implement body-limit and `File` support, then run `httpxtest`. |
+| `File` serves regular files only: a missing path or a directory writes nothing and returns a 404 rendered by the error handler (`hertzx` no longer lists a directory, `fiberx` no longer redirects to its absolute path). | Rely on the error handler; do not serve directories. |
+| `ValidRedirectCode` accepts 300, 301, 302, 303, 307 and 308 only; 304, 305 and 306 return an error and write nothing. | Use one of the accepted codes. |
+| `ParseError` classifies an error carrying a `*http.MaxBytesError` as 413 instead of 500, and `WrapBindError` reports it as 413 instead of 400. | Nothing — this is what lets `WithMaxBodySize` answer 413 on every adapter. |
+
+New in v0.0.6: `WithMaxBodySize(n)` on all five adapters, `httpx.ResponseHeaderEditor` / `httpx.AsResponseHeaderEditor`, and `httpx.CheckServeFile` / `httpx.ServeFile`.
 
 ## Related
 
